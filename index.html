@@ -822,16 +822,20 @@
                 <input id="tyt-target-input" class="input" type="number" step="0.25" min="1" max="120" value="65" style="width:100%; padding:4px 6px; font-size:12px;" required />
               </div>
               <div>
-                <label class="muted" style="font-size:10px;">Türkçe</label>
+                <label class="muted" style="font-size:10px;">Türkçe (40)</label>
                 <input id="tyt-tr-input" class="input" type="number" step="0.25" min="-10" max="40" placeholder="0" style="width:100%; padding:4px 6px; font-size:12px;" required />
               </div>
               <div>
-                <label class="muted" style="font-size:10px;">Matematik</label>
+                <label class="muted" style="font-size:10px;">Matematik (40)</label>
                 <input id="tyt-mat-input" class="input" type="number" step="0.25" min="-10" max="40" placeholder="0" style="width:100%; padding:4px 6px; font-size:12px;" required />
               </div>
               <div>
-                <label class="muted" style="font-size:10px;">Sos / Fen</label>
-                <input id="tyt-other-input" class="input" type="number" step="0.25" min="-10" max="40" value="0" style="width:100%; padding:4px 6px; font-size:12px;" />
+                <label class="muted" style="font-size:10px;">Sosyal (20)</label>
+                <input id="tyt-sos-input" class="input" type="number" step="0.25" min="-5" max="20" placeholder="0" style="width:100%; padding:4px 6px; font-size:12px;" />
+              </div>
+              <div style="grid-column: span 2;">
+                <label class="muted" style="font-size:10px;">Fen Bilimleri (20)</label>
+                <input id="tyt-fen-input" class="input" type="number" step="0.25" min="-5" max="20" placeholder="0" style="width:100%; padding:4px 6px; font-size:12px;" />
               </div>
             </div>
             <button type="submit" class="btn btn-primary" style="justify-content:center; padding:5px 8px; font-size:11.5px;">Denemeyi Kaydet (+25 XP)</button>
@@ -1918,7 +1922,9 @@
         const tytPct = Math.min(100, Math.max(0, Math.round((last.total / tgt) * 100)));
         document.getElementById('tyt-last-net').textContent = `Son: ${last.total}${diffStr}`;
         document.getElementById('tyt-progress-fill').style.width = `${tytPct}%`;
-        document.getElementById('tyt-breakdown').textContent = `${last.publisher ? last.publisher + ' • ' : ''}TR: ${last.tr} • Mat: ${last.mat} • Diğer: ${last.other}`;
+        const sosVal = last.sos !== undefined ? last.sos : (last.other || 0);
+        const fenVal = last.fen !== undefined ? last.fen : 0;
+        document.getElementById('tyt-breakdown').textContent = `${last.publisher ? last.publisher + ' • ' : ''}TR: ${last.tr} • Mat: ${last.mat} • Sos: ${sosVal} • Fen: ${fenVal}`;
 
         histDetails.classList.remove('hidden');
         document.getElementById('tyt-history-count').textContent = exams.length;
@@ -2772,17 +2778,20 @@
       const tgt = parseFloat(document.getElementById('tyt-target-input').value) || 65;
       const tr = parseFloat(document.getElementById('tyt-tr-input').value) || 0;
       const mat = parseFloat(document.getElementById('tyt-mat-input').value) || 0;
-      const other = parseFloat(document.getElementById('tyt-other-input').value) || 0;
+      const sos = parseFloat(document.getElementById('tyt-sos-input').value) || 0;
+      const fen = parseFloat(document.getElementById('tyt-fen-input').value) || 0;
       const publisher = tytPubSelect.value === 'Diğer'
         ? (tytPubCustom.value.trim() || 'Özel Deneme')
         : tytPubSelect.value;
-      const total = +(tr + mat + other).toFixed(2);
+      const total = +(tr + mat + sos + fen).toFixed(2);
       state.tytTarget = tgt;
       state.tytExams = state.tytExams || [];
-      state.tytExams.unshift({ dateKey: istanbulDateKey(), publisher, tr, mat, other, total });
+      state.tytExams.unshift({ dateKey: istanbulDateKey(), publisher, tr, mat, sos, fen, total });
       tytForm.classList.add('hidden');
       document.getElementById('tyt-tr-input').value = '';
       document.getElementById('tyt-mat-input').value = '';
+      document.getElementById('tyt-sos-input').value = '';
+      document.getElementById('tyt-fen-input').value = '';
       tytPubCustom.value = '';
       const bonus = total >= tgt ? 40 : 25;
       if (total >= tgt) showToast(`🎯 TYT hedefine (${tgt} net) ulaştın! +40 XP`);

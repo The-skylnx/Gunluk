@@ -1259,11 +1259,20 @@
 
       <!-- Filtreler & Ekleme -->
       <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-        <input id="uni-search" class="input" placeholder="🔍 Üniversite veya bölüm ara..." style="flex:1; min-width:170px;" />
+        <input id="uni-search" class="input" placeholder="🔍 Üniversite, bölüm veya il ara..." style="flex:1; min-width:160px;" />
+        <select id="uni-city-filter" class="input" aria-label="İl seçimi">
+          <option value="all">Tüm İller</option>
+        </select>
         <select id="uni-type-filter" class="input" aria-label="Program türü">
           <option value="all">Tümü (Ön Lisans + Lisans)</option>
           <option value="Ön Lisans">Ön Lisans (TYT)</option>
           <option value="Lisans">Lisans (SAY)</option>
+        </select>
+        <select id="uni-mode-filter" class="input" aria-label="Öğretim türü">
+          <option value="all">Tüm Öğretim Türleri</option>
+          <option value="Uzaktan Öğretim">Uzaktan Öğretim</option>
+          <option value="Örgün">Örgün (Devlet)</option>
+          <option value="Burslu">Burslu (Vakıf)</option>
         </select>
         <button id="toggle-add-uni-btn" type="button" class="btn btn-primary">+ Kendi Hedefini Ekle</button>
       </div>
@@ -1274,14 +1283,15 @@
         <div class="form-grid form-grid-3">
           <input id="u-name" class="input" placeholder="Üniversite (örn: Anadolu Üni.)" required />
           <input id="u-dept" class="input" placeholder="Bölüm (örn: Bilgisayar Prog.)" required />
+          <input id="u-city" class="input" placeholder="İl (örn: Eskişehir)" required />
+        </div>
+        <div class="form-grid form-grid-3">
           <select id="u-type" class="input">
             <option value="Ön Lisans">Ön Lisans (TYT)</option>
             <option value="Lisans">Lisans (SAY)</option>
           </select>
-        </div>
-        <div class="form-grid form-grid-2">
           <input id="u-mode" class="input" placeholder="Öğretim (Uzaktan / Örgün / Burslu)" value="Uzaktan Öğretim" />
-          <input id="u-ranks" class="input" placeholder="2025-2021 Sıralamalar (örn: 950000, 1105256, 567567)" />
+          <input id="u-ranks" class="input" placeholder="2025-2021 Sıralamalar (örn: 950000, 1105256)" />
         </div>
         <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
           <input id="u-tr" class="input" type="number" step="0.5" placeholder="TR Net" required />
@@ -2738,6 +2748,7 @@
         id: 'cukurova_uzaktan',
         name: 'Çukurova Üniversitesi',
         dept: 'Bilgisayar Programcılığı',
+        city: 'Adana',
         type: 'Ön Lisans',
         mode: 'Uzaktan Öğretim',
         nets: { tr: 23.5, mat: 11.5, sos: 9.0, fen: 4.5 },
@@ -2747,6 +2758,7 @@
         id: 'bandirma_uzaktan',
         name: 'Bandırma Onyedi Eylül Üni.',
         dept: 'Bilgisayar Programcılığı',
+        city: 'Balıkesir',
         type: 'Ön Lisans',
         mode: 'Uzaktan Öğretim',
         nets: { tr: 21.0, mat: 8.5, sos: 8.0, fen: 3.5 },
@@ -2756,6 +2768,7 @@
         id: 'ankara_yazilim',
         name: 'Ankara Üniversitesi',
         dept: 'Yazılım Mühendisliği',
+        city: 'Ankara',
         type: 'Lisans',
         mode: 'Örgün (Devlet)',
         nets: { tr: 32.5, mat: 30.0, sos: 15.0, fen: 14.25 },
@@ -2765,6 +2778,7 @@
         id: 'bau_yazilim',
         name: 'Bahçeşehir Üniversitesi',
         dept: 'Yazılım Mühendisliği (İng.)',
+        city: 'İstanbul',
         type: 'Lisans',
         mode: 'Burslu',
         nets: { tr: 33.5, mat: 33.0, sos: 15.0, fen: 16.0 },
@@ -2774,6 +2788,7 @@
         id: 'ted_yazilim',
         name: 'TED Üniversitesi',
         dept: 'Yazılım Mühendisliği (İng.)',
+        city: 'Ankara',
         type: 'Lisans',
         mode: 'Burslu',
         nets: { tr: 33.0, mat: 32.0, sos: 14.5, fen: 15.5 },
@@ -2783,6 +2798,7 @@
         id: 'cankaya_yazilim',
         name: 'Çankaya Üniversitesi',
         dept: 'Yazılım Mühendisliği (İng.)',
+        city: 'Ankara',
         type: 'Lisans',
         mode: 'Burslu',
         nets: { tr: 31.5, mat: 29.5, sos: 13.5, fen: 14.0 },
@@ -2826,12 +2842,25 @@
     let previewUniId = null;
     const uniModal = document.getElementById('uni-modal');
 
+    function syncUniCityFilter() {
+      const sel = document.getElementById('uni-city-filter');
+      const prev = sel.value || 'all';
+      const cities = [...new Set(getAllUnis().map(u => u.city).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'tr'));
+      sel.innerHTML = '<option value="all">Tüm İller</option>' + cities.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      sel.value = cities.includes(prev) ? prev : 'all';
+    }
+
     function renderUniModal() {
+      syncUniCityFilter();
       const q = (document.getElementById('uni-search').value || '').trim().toLowerCase();
+      const cityF = document.getElementById('uni-city-filter').value;
       const typeF = document.getElementById('uni-type-filter').value;
+      const modeF = document.getElementById('uni-mode-filter').value;
       const list = getAllUnis().filter(u => {
+        if (cityF !== 'all' && u.city !== cityF) return false;
         if (typeF !== 'all' && u.type !== typeF) return false;
-        if (q && !u.name.toLowerCase().includes(q) && !u.dept.toLowerCase().includes(q)) return false;
+        if (modeF !== 'all' && !(u.mode || '').toLowerCase().includes(modeF.toLowerCase())) return false;
+        if (q && !u.name.toLowerCase().includes(q) && !u.dept.toLowerCase().includes(q) && !(u.city || '').toLowerCase().includes(q)) return false;
         return true;
       });
 
@@ -2854,7 +2883,7 @@
           row.innerHTML = `
             <div style="min-width:0;">
               <div style="font-size:13px; font-weight:700;">${isTarget ? '⭐ ' : ''}${escapeHtml(u.name)} — ${escapeHtml(u.dept)}</div>
-              <div class="muted" style="font-size:11.5px;">${escapeHtml(u.type)} • ${escapeHtml(u.mode || '')} • Tahmini Taban: <strong class="mono">${tot} net</strong></div>
+              <div class="muted" style="font-size:11.5px;">${u.city ? `📍 ${escapeHtml(u.city)} • ` : ''}${escapeHtml(u.type)} • ${escapeHtml(u.mode || '')} • Tahmini Taban: <strong class="mono">${tot} net</strong></div>
             </div>
             <button type="button" class="btn ${isTarget ? 'btn-primary' : ''}" data-set-target="1" style="padding:4px 9px; font-size:11.5px;">${isTarget ? 'Hedefim ✓' : 'Hedef Yap'}</button>
           `;
@@ -2908,7 +2937,7 @@
       detailEl.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
           <strong style="font-size:13.5px;">📊 ${escapeHtml(u.name)} — ${escapeHtml(u.dept)}</strong>
-          <span class="badge-area">${escapeHtml(u.type)} • ${tot} Taban Net</span>
+          <span class="badge-area">${u.city ? `📍 ${escapeHtml(u.city)} • ` : ''}${escapeHtml(u.type)} • ${tot} Taban Net</span>
         </div>
         <div style="font-size:11.5px; font-weight:700;" class="muted">2025 – 2021 Başarı Sıralamaları</div>
         <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;">${yRows}</div>
@@ -2928,7 +2957,9 @@
     document.getElementById('close-uni-modal-btn').addEventListener('click', () => uniModal.classList.add('hidden'));
     uniModal.addEventListener('click', e => { if (e.target === uniModal) uniModal.classList.add('hidden'); });
     document.getElementById('uni-search').addEventListener('input', renderUniModal);
+    document.getElementById('uni-city-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-type-filter').addEventListener('change', renderUniModal);
+    document.getElementById('uni-mode-filter').addEventListener('change', renderUniModal);
 
     const addUniForm = document.getElementById('add-uni-form');
     document.getElementById('toggle-add-uni-btn').addEventListener('click', () => addUniForm.classList.toggle('hidden'));
@@ -2943,6 +2974,7 @@
         id: 'u_' + Date.now(),
         name: document.getElementById('u-name').value.trim(),
         dept: document.getElementById('u-dept').value.trim(),
+        city: document.getElementById('u-city').value.trim(),
         type: document.getElementById('u-type').value,
         mode: document.getElementById('u-mode').value.trim() || 'Örgün',
         nets: {

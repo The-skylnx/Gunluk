@@ -776,7 +776,10 @@
       <div class="nav-group">
         <div style="display:flex; align-items:center; justify-content:space-between; padding:0 8px 3px;">
           <span class="nav-label" style="padding:0;">📚 TYT Deneme Net</span>
-          <button id="toggle-tyt-btn" class="btn" style="padding:1px 7px; font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;" title="Hedef belirle veya deneme neti ekle" aria-label="TYT net ekle">+</button>
+          <div style="display:flex; gap:4px;">
+            <button id="toggle-tyt-chart-btn" class="btn" style="padding:1px 6px; font-size:12px; line-height:1.2;" title="Tüm TYT denemeleri ve gelişim grafiği" aria-label="TYT gelişim grafiği">📈</button>
+            <button id="toggle-tyt-btn" class="btn" style="padding:1px 7px; font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;" title="Hedef belirle veya deneme neti ekle" aria-label="TYT net ekle">+</button>
+          </div>
         </div>
         <div class="auth-box" style="margin-bottom:0; gap:5px;">
           <div style="display:flex; justify-content:space-between; align-items:baseline; font-size:12px;">
@@ -1226,6 +1229,19 @@
         </div>
       </div>
     </aside>
+  </div>
+
+  <!-- TYT Deneme Gelişim Grafiği Penceresi -->
+  <div id="tyt-chart-modal" class="drawer-backdrop hidden" style="display:flex; align-items:center; justify-content:center; padding:16px; z-index:75;">
+    <div class="stat-card" style="width:100%; max-width:460px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 16px 40px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="font-size:15px;">📈 TYT Deneme Gelişimi</strong>
+        <button id="close-tyt-chart-btn" type="button" class="del-x" aria-label="Kapat">×</button>
+      </div>
+      <div id="tyt-chart-svg-box"></div>
+      <div id="tyt-chart-stats" class="two-col-stats" style="grid-template-columns:repeat(3,1fr);"></div>
+      <div id="tyt-chart-list" style="display:flex; flex-direction:column; gap:4px; max-height:150px; overflow-y:auto; font-size:12px;"></div>
+    </div>
   </div>
 
   <!-- Profil İsmi Değiştirme Penceresi -->
@@ -2671,6 +2687,73 @@
       renderYksSchedule();
       showToast('📅 YKS programına eklendi!');
     });
+
+    // TYT Deneme Gelişim Grafiği Modalı
+    const tytChartModal = document.getElementById('tyt-chart-modal');
+    function openTytChartModal() {
+      const exams = [...(state.tytExams || [])].reverse(); // eskiden yeniye
+      const tgt = state.tytTarget || 65;
+      const svgBox = document.getElementById('tyt-chart-svg-box');
+      const statsBox = document.getElementById('tyt-chart-stats');
+      const listBox = document.getElementById('tyt-chart-list');
+
+      if (!exams.length) {
+        svgBox.innerHTML = '<div class="empty-box">Henüz deneme eklenmedi. Sol taraftan <strong>+</strong> butonuna basarak ilk denemeni ekleyebilirsin.</div>';
+        statsBox.innerHTML = '';
+        listBox.innerHTML = '';
+      } else {
+        const totals = exams.map(e => e.total);
+        const maxVal = Math.max(tgt, ...totals, 40);
+        const minVal = Math.max(0, Math.min(...totals) - 5);
+        const span = Math.max(10, maxVal - minVal);
+        const w = 400, h = 130, pad = 16;
+
+        const coords = exams.map((e, i) => {
+          const x = exams.length === 1 ? w / 2 : pad + (i * (w - pad * 2)) / (exams.length - 1);
+          const y = h - pad - (((e.total - minVal) / span) * (h - pad * 2));
+          return { x, y, e };
+        });
+
+        const tgtY = h - pad - (((tgt - minVal) / span) * (h - pad * 2));
+        const poly = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+        const dots = coords.map(c => `
+          <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="4.5" fill="var(--primary)" stroke="var(--surface)" stroke-width="1.5">
+            <title>${escapeHtml(c.e.publisher || 'Deneme')} (${c.e.dateKey}): ${c.e.total} net</title>
+          </circle>
+          <text x="${c.x.toFixed(1)}" y="${(c.y - 8).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--fg)">${c.e.total}</text>
+        `).join('');
+
+        svgBox.innerHTML = `
+          <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="background:var(--content); border-radius:10px;" role="img" aria-label="TYT Net Gelişim Grafiği">
+            <line x1="${pad}" y1="${tgtY.toFixed(1)}" x2="${w - pad}" y2="${tgtY.toFixed(1)}" stroke="var(--success)" stroke-dasharray="4 4" stroke-width="1.2" />
+            <text x="${w - pad}" y="${(tgtY - 4).toFixed(1)}" text-anchor="end" font-size="9.5" fill="var(--success)">Hedef: ${tgt}</text>
+            ${exams.length > 1 ? `<polyline fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${poly}" />` : ''}
+            ${dots}
+          </svg>
+        `;
+
+        const best = Math.max(...totals);
+        const avg = (totals.reduce((a, b) => a + b, 0) / totals.length).toFixed(1);
+        const latest = totals[totals.length - 1];
+        statsBox.innerHTML = `
+          <div class="stat-card" style="padding:8px 10px;"><div class="muted" style="font-size:10.5px;">En Yüksek</div><div class="mono" style="font-size:15px; font-weight:800; color:var(--success);">${best}</div></div>
+          <div class="stat-card" style="padding:8px 10px;"><div class="muted" style="font-size:10.5px;">Ortalama</div><div class="mono" style="font-size:15px; font-weight:800;">${avg}</div></div>
+          <div class="stat-card" style="padding:8px 10px;"><div class="muted" style="font-size:10.5px;">Son Net</div><div class="mono" style="font-size:15px; font-weight:800; color:var(--primary);">${latest}</div></div>
+        `;
+
+        listBox.innerHTML = [...exams].reverse().map(ex => `
+          <div style="display:flex; justify-content:space-between; padding:5px 8px; border-radius:6px; background:var(--content);">
+            <span><strong>${escapeHtml(ex.publisher || 'Deneme')}</strong> <span class="muted">(${ex.dateKey || ''})</span></span>
+            <span class="mono"><strong>${ex.total}</strong> <span class="muted">(TR:${ex.tr} M:${ex.mat})</span></span>
+          </div>
+        `).join('');
+      }
+      tytChartModal.classList.remove('hidden');
+    }
+
+    document.getElementById('toggle-tyt-chart-btn').addEventListener('click', openTytChartModal);
+    document.getElementById('close-tyt-chart-btn').addEventListener('click', () => tytChartModal.classList.add('hidden'));
+    tytChartModal.addEventListener('click', e => { if (e.target === tytChartModal) tytChartModal.classList.add('hidden'); });
 
     // TYT Deneme Net Hedef & Kayıt
     const tytForm = document.getElementById('tyt-form');

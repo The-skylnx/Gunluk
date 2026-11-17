@@ -759,19 +759,6 @@
         </div>
       </div>
 
-      <div class="nav-group">
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:0 8px 3px;">
-          <span class="nav-label" style="padding:0;">Alanlar</span>
-          <button id="toggle-area-btn" class="btn" style="padding:1px 7px; font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;" title="Yeni alan ekle" aria-label="Yeni alan ekle">+</button>
-        </div>
-        <div id="areas-nav"></div>
-        <form id="new-area-form" class="hidden" style="display:flex; gap:6px; padding:4px 6px; align-items:center;">
-          <input id="new-area-color" type="color" value="#3b82f6" title="Alan rengi" aria-label="Alan rengi" style="width:28px; height:28px; padding:0; border:1px solid var(--border); border-radius:6px; background:transparent; cursor:pointer; flex-shrink:0;" />
-          <input id="new-area-input" class="input" style="padding:5px 8px; font-size:12px; width:100%;" placeholder="Alan adı..." aria-label="Yeni alan adı" required />
-          <button type="submit" class="btn btn-primary" style="padding:5px 9px; font-size:12px;">+</button>
-        </form>
-      </div>
-
       <!-- TYT Deneme Net Hedef & Takip (Sol Kenar Çubuğu) -->
       <div class="nav-group">
         <div style="display:flex; align-items:center; justify-content:space-between; padding:0 8px 3px;">
@@ -979,7 +966,10 @@
           <div style="font-size:13px; font-weight:700;">Yeni Alışkanlık Oluştur</div>
           <div class="form-grid form-grid-3">
             <input id="habit-title" class="input" placeholder="Alışkanlık (örn: Kitap Oku)" required />
-            <select id="habit-area" class="input" aria-label="Alan"></select>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <select id="habit-area" class="input" aria-label="Alan"></select>
+              <input id="habit-custom-area" class="input hidden" placeholder="Yeni alan adı..." style="font-size:12px; padding:5px 8px;" />
+            </div>
             <select id="habit-type" class="input" aria-label="Takip türü">
               <option value="count">Ölçülebilir Hedef (sayfa, dk, adet)</option>
               <option value="timer">Zamanlayıcı (dk)</option>
@@ -1099,6 +1089,7 @@
               <strong style="font-size:13.5px;">⚡ Bugün Ne Başardın / Öğrendin?</strong>
               <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                 <select id="log-area" class="input" style="padding:4px 8px; font-size:12px;" aria-label="Not alanı"></select>
+                <input id="log-custom-area" class="input hidden" placeholder="Yeni alan..." style="padding:4px 8px; font-size:12px; width:115px;" />
                 <select id="log-difficulty" class="input" style="padding:4px 8px; font-size:12px;" aria-label="Zorluk seviyesi">
                   <option value="easy">Kolay (x0.85)</option>
                   <option value="medium" selected>Orta (x1.0)</option>
@@ -1951,47 +1942,7 @@
         histDetails.classList.add('hidden');
       }
 
-      // Alanlar + Mini Seviye Halkaları + Renk + Silme
-      const areasNav = document.getElementById('areas-nav');
-      areasNav.innerHTML = '';
-      getAreaStats().forEach(a => {
-        const btn = document.createElement('button');
-        const key = `area:${a.name}`;
-        btn.className = `nav-item${activeView === key ? ' active' : ''}`;
-        const r = 7, c = 2 * Math.PI * r;
-        const dash = `${((a.pct / 100) * c).toFixed(1)} ${c.toFixed(1)}`;
-        const ringColor = (state.areaColors && state.areaColors[a.name]) || 'currentColor';
-        const canDelete = state.areas.includes(a.name);
-        btn.innerHTML = `
-          <span class="area-ring-row">
-            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-              <circle cx="9" cy="9" r="${r}" fill="none" stroke="currentColor" stroke-opacity="0.2" stroke-width="2.5"/>
-              <circle cx="9" cy="9" r="${r}" fill="none" stroke="${activeView === key ? 'currentColor' : ringColor}" stroke-width="2.5" stroke-dasharray="${dash}" transform="rotate(-90 9 9)"/>
-            </svg>
-            <span>${escapeHtml(a.name)}</span>
-          </span>
-          <span style="display:flex; align-items:center; gap:4px;">
-            <span class="mono" style="font-size:11px; opacity:0.85;">Lv.${a.level}</span>
-            ${canDelete ? `<span class="del-x" data-del-area="${escapeHtml(a.name)}" title="Alanı kaldır" aria-label="Alanı kaldır" style="padding:0 4px; font-size:13px;">×</span>` : ''}
-          </span>
-        `;
-        btn.addEventListener('click', (e) => {
-          const delBtn = e.target.closest('[data-del-area]');
-          if (delBtn) {
-            e.stopPropagation();
-            const areaName = delBtn.dataset.delArea;
-            state.areas = state.areas.filter(x => x !== areaName);
-            if (state.areaColors) delete state.areaColors[areaName];
-            if (activeView === `area:${areaName}`) activeView = 'all';
-            saveState(); render();
-            return;
-          }
-          activeView = activeView === key ? 'all' : key; closeDrawers(); render();
-        });
-        areasNav.appendChild(btn);
-      });
-
-      // Dropdownlar
+      // Dropdownlar (+ Yeni Alan seçeneği dahil)
       ['habit-area', 'log-area'].forEach(id => {
         const sel = document.getElementById(id);
         const prev = sel.value;
@@ -2004,6 +1955,9 @@
           const o = document.createElement('option');
           o.value = 'Genel Gelişim'; o.textContent = 'Genel Gelişim'; sel.appendChild(o);
         }
+        const addOpt = document.createElement('option');
+        addOpt.value = '__new__'; addOpt.textContent = '+ Yeni Alan Ekle...';
+        sel.appendChild(addOpt);
         if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
       });
 
@@ -2798,23 +2752,31 @@
       addXP(bonus, e.submitter);
     });
 
-    // Yeni Alan
-    const areaForm = document.getElementById('new-area-form');
-    document.getElementById('toggle-area-btn').addEventListener('click', () => {
-      areaForm.classList.toggle('hidden'); document.getElementById('new-area-input').focus();
-    });
-    areaForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const val = document.getElementById('new-area-input').value.trim();
-      const color = document.getElementById('new-area-color').value || '#3b82f6';
-      if (val && !state.areas.includes(val)) {
-        state.areas.push(val);
-        state.areaColors = state.areaColors || {};
-        state.areaColors[val] = color;
-        saveState();
+    // Alan seçicilerde "+ Yeni Alan Ekle..." desteği
+    function resolveSelectedArea(selectId, customInputId) {
+      const sel = document.getElementById(selectId);
+      const customEl = document.getElementById(customInputId);
+      if (sel.value === '__new__') {
+        const name = customEl.value.trim() || 'Genel Gelişim';
+        if (name !== 'Genel Gelişim' && !state.areas.includes(name)) {
+          state.areas.push(name);
+        }
+        customEl.value = '';
+        customEl.classList.add('hidden');
+        return name;
       }
-      document.getElementById('new-area-input').value = '';
-      areaForm.classList.add('hidden'); render();
+      return sel.value;
+    }
+
+    document.getElementById('habit-area').addEventListener('change', e => {
+      const el = document.getElementById('habit-custom-area');
+      el.classList.toggle('hidden', e.target.value !== '__new__');
+      if (e.target.value === '__new__') el.focus();
+    });
+    document.getElementById('log-area').addEventListener('change', e => {
+      const el = document.getElementById('log-custom-area');
+      el.classList.toggle('hidden', e.target.value !== '__new__');
+      if (e.target.value === '__new__') el.focus();
     });
 
     // Yeni Alışkanlık
@@ -2833,11 +2795,12 @@
       e.preventDefault();
       const title = document.getElementById('habit-title').value.trim();
       const type = document.getElementById('habit-type').value;
+      const area = resolveSelectedArea('habit-area', 'habit-custom-area');
       state.habits.unshift({
         id: 'h' + Date.now(),
         icon: selectedHabitIcon || '🎯',
         title,
-        area: document.getElementById('habit-area').value,
+        area,
         type,
         current: 0,
         target: Math.max(1, parseInt(document.getElementById('habit-target').value, 10) || 1),
@@ -2889,7 +2852,7 @@
       const xp = estimateLogXP(text, logDiffEl.value);
       state.logs.unshift({
         id: 'l' + Date.now(),
-        area: document.getElementById('log-area').value,
+        area: resolveSelectedArea('log-area', 'log-custom-area'),
         text,
         tags: extractTags(text),
         mood: selectedMood,

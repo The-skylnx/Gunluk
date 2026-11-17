@@ -834,6 +834,18 @@
         </div>
       </div>
 
+      <!-- Hedef Üniversite & Net Uzaklığı (Sol Kenar Çubuğu) -->
+      <div class="nav-group">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:0 8px 3px;">
+          <span class="nav-label" style="padding:0;">🎓 Hedef Üniversite</span>
+          <button id="open-uni-modal-btn" class="btn" style="padding:1px 7px; font-size:11.5px; font-weight:700; color:var(--primary); line-height:1.3;" title="Hedef üniversite seç veya ekle">Seç / Detay</button>
+        </div>
+        <div id="uni-sidebar-card" class="auth-box" style="margin-bottom:0; gap:4px; cursor:pointer;">
+          <div id="uni-sidebar-name" style="font-size:12px; font-weight:700;">Hedef seçilmedi</div>
+          <div id="uni-sidebar-gap" class="muted" style="font-size:11px;">Ön Lisans / Lisans hedeflerini incele</div>
+        </div>
+      </div>
+
       <div class="sidebar-footer">
         <div class="nav-label">Tercihler &amp; Yedek</div>
         <button id="sound-toggle-btn" class="nav-item">🔊 Efekt Sesleri: Açık</button>
@@ -1230,6 +1242,67 @@
     </aside>
   </div>
 
+  <!-- Hedef Üniversite & YÖK Atlas / Kariyer.net Karşılaştırma Penceresi -->
+  <div id="uni-modal" class="drawer-backdrop hidden" style="display:flex; align-items:center; justify-content:center; padding:14px; z-index:76;">
+    <div class="stat-card" style="width:100%; max-width:740px; max-height:90vh; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 20px 50px rgba(0,0,0,0.55);">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+        <div>
+          <strong style="font-size:16px;">🎓 Hedef Üniversite &amp; Net Uzaklığı</strong>
+          <div class="muted" style="font-size:11.5px;">YÖK Atlas &amp; Kariyer.net referans verileri + kendi hedeflerin</div>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <a href="https://yokatlas.yok.gov.tr/tercih-sihirbazi-t4-tablo.php" target="_blank" rel="noopener" class="btn" style="font-size:11.5px; text-decoration:none;">YÖK Atlas ↗</a>
+          <a href="https://www.kariyer.net/universite-tercih-robotu" target="_blank" rel="noopener" class="btn" style="font-size:11.5px; text-decoration:none;">Kariyer.net ↗</a>
+          <button id="close-uni-modal-btn" type="button" class="del-x" aria-label="Kapat">×</button>
+        </div>
+      </div>
+
+      <!-- Filtreler & Ekleme -->
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <input id="uni-search" class="input" placeholder="🔍 Üniversite veya bölüm ara..." style="flex:1; min-width:170px;" />
+        <select id="uni-type-filter" class="input" aria-label="Program türü">
+          <option value="all">Tümü (Ön Lisans + Lisans)</option>
+          <option value="Ön Lisans">Ön Lisans (TYT)</option>
+          <option value="Lisans">Lisans (SAY)</option>
+        </select>
+        <button id="toggle-add-uni-btn" type="button" class="btn btn-primary">+ Kendi Hedefini Ekle</button>
+      </div>
+
+      <!-- Özel Üniversite Ekleme Formu -->
+      <form id="add-uni-form" class="inline-panel hidden" style="gap:8px;">
+        <strong style="font-size:12.5px;">Özel Hedef Üniversite / Bölüm Ekle</strong>
+        <div class="form-grid form-grid-3">
+          <input id="u-name" class="input" placeholder="Üniversite (örn: Anadolu Üni.)" required />
+          <input id="u-dept" class="input" placeholder="Bölüm (örn: Bilgisayar Prog.)" required />
+          <select id="u-type" class="input">
+            <option value="Ön Lisans">Ön Lisans (TYT)</option>
+            <option value="Lisans">Lisans (SAY)</option>
+          </select>
+        </div>
+        <div class="form-grid form-grid-2">
+          <input id="u-mode" class="input" placeholder="Öğretim (Uzaktan / Örgün / Burslu)" value="Uzaktan Öğretim" />
+          <input id="u-ranks" class="input" placeholder="2025-2021 Sıralamalar (örn: 950000, 1105256, 567567)" />
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
+          <input id="u-tr" class="input" type="number" step="0.5" placeholder="TR Net" required />
+          <input id="u-mat" class="input" type="number" step="0.5" placeholder="Mat Net" required />
+          <input id="u-sos" class="input" type="number" step="0.5" placeholder="Sos Net" value="8" />
+          <input id="u-fen" class="input" type="number" step="0.5" placeholder="Fen Net" value="4" />
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+          <button type="button" id="cancel-uni-btn" class="btn">İptal</button>
+          <button type="submit" class="btn btn-primary">Listeye Ekle</button>
+        </div>
+      </form>
+
+      <!-- Üniversite Listesi + Seçili Detay -->
+      <div style="display:grid; grid-template-columns:1fr; gap:12px;">
+        <div id="uni-list" style="display:flex; flex-direction:column; gap:6px; max-height:200px; overflow-y:auto;"></div>
+        <div id="uni-detail-panel" class="inline-panel" style="gap:10px;"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- TYT Deneme Gelişim Grafiği Penceresi -->
   <div id="tyt-chart-modal" class="drawer-backdrop hidden" style="display:flex; align-items:center; justify-content:center; padding:16px; z-index:75;">
     <div class="stat-card" style="width:100%; max-width:460px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 16px 40px rgba(0,0,0,0.5);">
@@ -1351,7 +1424,9 @@
         dailyQuestClaimedDate: null,
         tytTarget: 65,
         tytExams: [],
-        yksProgram: [] // { id, day (0..6), time, subject, topic, doneWeekKey }
+        yksProgram: [], // { id, day (0..6), time, subject, topic, doneWeekKey }
+        targetUniId: 'cukurova_uzaktan',
+        customUnis: []
       };
     }
 
@@ -1394,6 +1469,8 @@
       if (!Array.isArray(merged.tytExams)) merged.tytExams = [];
       if (!merged.tytTarget) merged.tytTarget = 65;
       if (!Array.isArray(merged.yksProgram)) merged.yksProgram = [];
+      if (!Array.isArray(merged.customUnis)) merged.customUnis = [];
+      if (!merged.targetUniId) merged.targetUniId = 'cukurova_uzaktan';
       return rollDaysIfNeeded(merged);
     }
 
@@ -2144,6 +2221,7 @@
       }
 
       renderYksSchedule();
+      renderUniSidebar();
       updateEstimatedXP();
     }
 
@@ -2650,6 +2728,226 @@
       saveState();
       renderYksSchedule();
       showToast('📅 YKS programına eklendi!');
+    });
+
+    /* =====================================================================
+       BÖLÜM 8C: HEDEF ÜNİVERSİTE VERİTABANI (YÖK ATLAS / KARİYER.NET REFERANS)
+       ===================================================================== */
+    const DEFAULT_UNIS = [
+      {
+        id: 'cukurova_uzaktan',
+        name: 'Çukurova Üniversitesi',
+        dept: 'Bilgisayar Programcılığı',
+        type: 'Ön Lisans',
+        mode: 'Uzaktan Öğretim',
+        nets: { tr: 23.5, mat: 11.5, sos: 9.0, fen: 4.5 },
+        years: { '2025': '—', '2024': '1.105.256', '2023': '567.567', '2022': '889.415', '2021': '979.645' }
+      },
+      {
+        id: 'bandirma_uzaktan',
+        name: 'Bandırma Onyedi Eylül Üni.',
+        dept: 'Bilgisayar Programcılığı',
+        type: 'Ön Lisans',
+        mode: 'Uzaktan Öğretim',
+        nets: { tr: 21.0, mat: 8.5, sos: 8.0, fen: 3.5 },
+        years: { '2025': '—', '2024': '1.469.951', '2023': '1.180.073', '2022': '1.346.183', '2021': '—' }
+      },
+      {
+        id: 'ankara_yazilim',
+        name: 'Ankara Üniversitesi',
+        dept: 'Yazılım Mühendisliği',
+        type: 'Lisans',
+        mode: 'Örgün (Devlet)',
+        nets: { tr: 32.0, mat: 30.5, sos: 14.0, fen: 14.5 },
+        years: { '2025': '46.156', '2024': '35.288', '2023': '25.681', '2022': '—', '2021': '—' }
+      },
+      {
+        id: 'bau_yazilim',
+        name: 'Bahçeşehir Üniversitesi',
+        dept: 'Yazılım Mühendisliği (İng.)',
+        type: 'Lisans',
+        mode: 'Burslu',
+        nets: { tr: 33.5, mat: 33.0, sos: 15.0, fen: 16.0 },
+        years: { '2025': '32.862', '2024': '14.245', '2023': '6.884', '2022': '—', '2021': '—' }
+      },
+      {
+        id: 'ted_yazilim',
+        name: 'TED Üniversitesi',
+        dept: 'Yazılım Mühendisliği (İng.)',
+        type: 'Lisans',
+        mode: 'Burslu',
+        nets: { tr: 33.0, mat: 32.0, sos: 14.5, fen: 15.5 },
+        years: { '2025': '29.359', '2024': '15.359', '2023': '13.034', '2022': '—', '2021': '—' }
+      },
+      {
+        id: 'cankaya_yazilim',
+        name: 'Çankaya Üniversitesi',
+        dept: 'Yazılım Mühendisliği (İng.)',
+        type: 'Lisans',
+        mode: 'Burslu',
+        nets: { tr: 31.5, mat: 29.5, sos: 13.5, fen: 14.0 },
+        years: { '2025': '48.552', '2024': '36.278', '2023': '18.372', '2022': '—', '2021': '—' }
+      }
+    ];
+
+    function getAllUnis() {
+      return [...(state.customUnis || []), ...DEFAULT_UNIS];
+    }
+
+    function uniTotalNet(u) {
+      const n = u.nets || {};
+      return +((n.tr || 0) + (n.mat || 0) + (n.sos || 0) + (n.fen || 0)).toFixed(2);
+    }
+
+    function renderUniSidebar() {
+      const target = getAllUnis().find(u => u.id === state.targetUniId) || getAllUnis()[0];
+      if (!target) return;
+      const reqTotal = uniTotalNet(target);
+      const lastExam = (state.tytExams || [])[0];
+      document.getElementById('uni-sidebar-name').textContent = `${target.name} • ${target.dept}`;
+      if (lastExam) {
+        const diff = +(lastExam.total - reqTotal).toFixed(2);
+        const gapEl = document.getElementById('uni-sidebar-gap');
+        if (diff >= 0) {
+          gapEl.innerHTML = `<span style="color:var(--success); font-weight:700;">+${diff} net öndesin! ✅</span> (${target.type})`;
+        } else {
+          gapEl.innerHTML = `<span style="color:var(--warning); font-weight:700;">Hedefe ${Math.abs(diff)} net kaldı</span> (${reqTotal} net)`;
+        }
+      } else {
+        document.getElementById('uni-sidebar-gap').textContent = `${target.type} • Taban: ~${reqTotal} net`;
+      }
+    }
+
+    let previewUniId = null;
+    const uniModal = document.getElementById('uni-modal');
+
+    function renderUniModal() {
+      const q = (document.getElementById('uni-search').value || '').trim().toLowerCase();
+      const typeF = document.getElementById('uni-type-filter').value;
+      const list = getAllUnis().filter(u => {
+        if (typeF !== 'all' && u.type !== typeF) return false;
+        if (q && !u.name.toLowerCase().includes(q) && !u.dept.toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      if (!previewUniId || !list.some(u => u.id === previewUniId)) {
+        previewUniId = (list.find(u => u.id === state.targetUniId) || list[0] || {}).id || null;
+      }
+
+      const listEl = document.getElementById('uni-list');
+      listEl.innerHTML = '';
+      if (!list.length) {
+        listEl.innerHTML = '<div class="empty-box">Eşleşen üniversite bulunamadı. <strong>+ Kendi Hedefini Ekle</strong> ile ekleyebilirsin.</div>';
+      } else {
+        list.forEach(u => {
+          const isTarget = u.id === state.targetUniId;
+          const isSel = u.id === previewUniId;
+          const tot = uniTotalNet(u);
+          const row = document.createElement('div');
+          row.className = `habit-row${isSel ? ' selected' : ''}`;
+          row.style.cssText = 'padding:8px 12px; border:1px solid var(--border); border-radius:9px;';
+          row.innerHTML = `
+            <div style="min-width:0;">
+              <div style="font-size:13px; font-weight:700;">${isTarget ? '⭐ ' : ''}${escapeHtml(u.name)} — ${escapeHtml(u.dept)}</div>
+              <div class="muted" style="font-size:11.5px;">${escapeHtml(u.type)} • ${escapeHtml(u.mode || '')} • Tahmini Taban: <strong class="mono">${tot} net</strong></div>
+            </div>
+            <button type="button" class="btn ${isTarget ? 'btn-primary' : ''}" data-set-target="1" style="padding:4px 9px; font-size:11.5px;">${isTarget ? 'Hedefim ✓' : 'Hedef Yap'}</button>
+          `;
+          row.addEventListener('click', e => {
+            if (e.target.closest('[data-set-target]')) {
+              state.targetUniId = u.id;
+              state.tytTarget = tot;
+              saveState(); render(); renderUniModal();
+              showToast(`🎓 Hedef güncellendi: ${u.name} (${tot} net)`);
+              return;
+            }
+            previewUniId = u.id;
+            renderUniModal();
+          });
+          listEl.appendChild(row);
+        });
+      }
+
+      const detailEl = document.getElementById('uni-detail-panel');
+      const u = getAllUnis().find(x => x.id === previewUniId);
+      if (!u) { detailEl.classList.add('hidden'); return; }
+      detailEl.classList.remove('hidden');
+
+      const lastExam = (state.tytExams || [])[0];
+      const n = u.nets;
+      const tot = uniTotalNet(u);
+      const diffBadge = (yours, req) => {
+        if (yours === null) return `<span class="muted">Hedef: ${req}</span>`;
+        const d = +(yours - req).toFixed(2);
+        return d >= 0
+          ? `<span style="color:var(--success); font-weight:700;">+${d} (Öndesin)</span>`
+          : `<span style="color:var(--warning); font-weight:700;">${d} (${Math.abs(d)} net kaldı)</span>`;
+      };
+
+      const yRows = ['2025', '2024', '2023', '2022', '2021'].map(yr => `
+        <div style="text-align:center; padding:6px; border-radius:7px; background:var(--surface); border:1px solid var(--border);">
+          <div class="muted" style="font-size:10.5px;">${yr}</div>
+          <div class="mono" style="font-size:11.5px; font-weight:700;">${escapeHtml((u.years && u.years[yr]) || '—')}</div>
+        </div>
+      `).join('');
+
+      const mySos = lastExam ? (lastExam.sos !== undefined ? lastExam.sos : (lastExam.other || 0)) : null;
+      const myFen = lastExam ? (lastExam.fen !== undefined ? lastExam.fen : 0) : null;
+
+      detailEl.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+          <strong style="font-size:13.5px;">📊 ${escapeHtml(u.name)} — ${escapeHtml(u.dept)}</strong>
+          <span class="badge-area">${escapeHtml(u.type)} • ${tot} Taban Net</span>
+        </div>
+        <div style="font-size:11.5px; font-weight:700;" class="muted">2025 – 2021 Başarı Sıralamaları</div>
+        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;">${yRows}</div>
+        <div style="font-size:11.5px; font-weight:700;" class="muted">Ders Bazlı Net Karşılaştırması ${lastExam ? `(Son Denemen: ${lastExam.total} net)` : '(Henüz deneme girmedin)'}</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:6px; font-size:12px;">
+          <div class="stat-card" style="padding:8px;">Türkçe: <strong>${n.tr}</strong><br/>${diffBadge(lastExam ? lastExam.tr : null, n.tr)}</div>
+          <div class="stat-card" style="padding:8px;">Matematik: <strong>${n.mat}</strong><br/>${diffBadge(lastExam ? lastExam.mat : null, n.mat)}</div>
+          <div class="stat-card" style="padding:8px;">Sosyal: <strong>${n.sos}</strong><br/>${diffBadge(mySos, n.sos)}</div>
+          <div class="stat-card" style="padding:8px;">Fen: <strong>${n.fen}</strong><br/>${diffBadge(myFen, n.fen)}</div>
+        </div>
+      `;
+    }
+
+    document.getElementById('open-uni-modal-btn').addEventListener('click', () => { renderUniModal(); uniModal.classList.remove('hidden'); });
+    document.getElementById('uni-sidebar-card').addEventListener('click', () => { renderUniModal(); uniModal.classList.remove('hidden'); });
+    document.getElementById('close-uni-modal-btn').addEventListener('click', () => uniModal.classList.add('hidden'));
+    uniModal.addEventListener('click', e => { if (e.target === uniModal) uniModal.classList.add('hidden'); });
+    document.getElementById('uni-search').addEventListener('input', renderUniModal);
+    document.getElementById('uni-type-filter').addEventListener('change', renderUniModal);
+
+    const addUniForm = document.getElementById('add-uni-form');
+    document.getElementById('toggle-add-uni-btn').addEventListener('click', () => addUniForm.classList.toggle('hidden'));
+    document.getElementById('cancel-uni-btn').addEventListener('click', () => addUniForm.classList.add('hidden'));
+    addUniForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const rankParts = document.getElementById('u-ranks').value.split(',').map(s => s.trim());
+      const yrKeys = ['2025', '2024', '2023', '2022', '2021'];
+      const years = {};
+      yrKeys.forEach((y, i) => { years[y] = rankParts[i] || '—'; });
+      const newUni = {
+        id: 'u_' + Date.now(),
+        name: document.getElementById('u-name').value.trim(),
+        dept: document.getElementById('u-dept').value.trim(),
+        type: document.getElementById('u-type').value,
+        mode: document.getElementById('u-mode').value.trim() || 'Örgün',
+        nets: {
+          tr: parseFloat(document.getElementById('u-tr').value) || 0,
+          mat: parseFloat(document.getElementById('u-mat').value) || 0,
+          sos: parseFloat(document.getElementById('u-sos').value) || 0,
+          fen: parseFloat(document.getElementById('u-fen').value) || 0
+        },
+        years
+      };
+      state.customUnis = state.customUnis || [];
+      state.customUnis.unshift(newUni);
+      state.targetUniId = newUni.id;
+      previewUniId = newUni.id;
+      addUniForm.reset(); addUniForm.classList.add('hidden');
+      saveState(); render(); renderUniModal();
+      showToast(`🎓 "${newUni.name}" hedefin olarak eklendi!`);
     });
 
     // TYT Deneme Gelişim Grafiği Modalı

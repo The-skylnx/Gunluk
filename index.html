@@ -1425,7 +1425,7 @@
         tytTarget: 65,
         tytExams: [],
         yksProgram: [], // { id, day (0..6), time, subject, topic, doneWeekKey }
-        targetUniId: 'cukurova_uzaktan',
+        targetUniId: null,
         customUnis: []
       };
     }
@@ -1470,7 +1470,7 @@
       if (!merged.tytTarget) merged.tytTarget = 65;
       if (!Array.isArray(merged.yksProgram)) merged.yksProgram = [];
       if (!Array.isArray(merged.customUnis)) merged.customUnis = [];
-      if (!merged.targetUniId) merged.targetUniId = 'cukurova_uzaktan';
+      if (merged.targetUniId === undefined) merged.targetUniId = null;
       return rollDaysIfNeeded(merged);
     }
 
@@ -2741,7 +2741,7 @@
         type: 'Ön Lisans',
         mode: 'Uzaktan Öğretim',
         nets: { tr: 23.5, mat: 11.5, sos: 9.0, fen: 4.5 },
-        years: { '2025': '—', '2024': '1.105.256', '2023': '567.567', '2022': '889.415', '2021': '979.645' }
+        years: { '2025': '996.415', '2024': '1.105.256', '2023': '567.567', '2022': '889.415', '2021': '979.645' }
       },
       {
         id: 'bandirma_uzaktan',
@@ -2750,7 +2750,7 @@
         type: 'Ön Lisans',
         mode: 'Uzaktan Öğretim',
         nets: { tr: 21.0, mat: 8.5, sos: 8.0, fen: 3.5 },
-        years: { '2025': '—', '2024': '1.469.951', '2023': '1.180.073', '2022': '1.346.183', '2021': '—' }
+        years: { '2025': '1.321.079', '2024': '1.469.951', '2023': '1.180.073', '2022': '1.346.183', '2021': '—' }
       },
       {
         id: 'ankara_yazilim',
@@ -2758,8 +2758,8 @@
         dept: 'Yazılım Mühendisliği',
         type: 'Lisans',
         mode: 'Örgün (Devlet)',
-        nets: { tr: 32.0, mat: 30.5, sos: 14.0, fen: 14.5 },
-        years: { '2025': '46.156', '2024': '35.288', '2023': '25.681', '2022': '—', '2021': '—' }
+        nets: { tr: 32.5, mat: 30.0, sos: 15.0, fen: 14.25 },
+        years: { '2025': '46.156', '2024': '35.288', '2023': '25.681', '2022': '33.483', '2021': '—' }
       },
       {
         id: 'bau_yazilim',
@@ -2768,7 +2768,7 @@
         type: 'Lisans',
         mode: 'Burslu',
         nets: { tr: 33.5, mat: 33.0, sos: 15.0, fen: 16.0 },
-        years: { '2025': '32.862', '2024': '14.245', '2023': '6.884', '2022': '—', '2021': '—' }
+        years: { '2025': '32.862', '2024': '14.245', '2023': '6.884', '2022': '5.678', '2021': '7.180' }
       },
       {
         id: 'ted_yazilim',
@@ -2777,7 +2777,7 @@
         type: 'Lisans',
         mode: 'Burslu',
         nets: { tr: 33.0, mat: 32.0, sos: 14.5, fen: 15.5 },
-        years: { '2025': '29.359', '2024': '15.359', '2023': '13.034', '2022': '—', '2021': '—' }
+        years: { '2025': '29.359', '2024': '15.359', '2023': '13.034', '2022': '32.106', '2021': '42.142' }
       },
       {
         id: 'cankaya_yazilim',
@@ -2786,7 +2786,7 @@
         type: 'Lisans',
         mode: 'Burslu',
         nets: { tr: 31.5, mat: 29.5, sos: 13.5, fen: 14.0 },
-        years: { '2025': '48.552', '2024': '36.278', '2023': '18.372', '2022': '—', '2021': '—' }
+        years: { '2025': '48.552', '2024': '36.278', '2023': '18.372', '2022': '38.923', '2021': '45.300' }
       }
     ];
 
@@ -2800,21 +2800,26 @@
     }
 
     function renderUniSidebar() {
-      const target = getAllUnis().find(u => u.id === state.targetUniId) || getAllUnis()[0];
-      if (!target) return;
+      const target = state.targetUniId ? getAllUnis().find(u => u.id === state.targetUniId) : null;
+      const nameEl = document.getElementById('uni-sidebar-name');
+      const gapEl = document.getElementById('uni-sidebar-gap');
+      if (!target) {
+        nameEl.textContent = '🎯 Hedef Seç';
+        gapEl.innerHTML = 'Üniversite ve bölüm seçmek için tıkla';
+        return;
+      }
       const reqTotal = uniTotalNet(target);
       const lastExam = (state.tytExams || [])[0];
-      document.getElementById('uni-sidebar-name').textContent = `${target.name} • ${target.dept}`;
+      nameEl.textContent = `${target.name} • ${target.dept}`;
       if (lastExam) {
         const diff = +(lastExam.total - reqTotal).toFixed(2);
-        const gapEl = document.getElementById('uni-sidebar-gap');
         if (diff >= 0) {
           gapEl.innerHTML = `<span style="color:var(--success); font-weight:700;">+${diff} net öndesin! ✅</span> (${target.type})`;
         } else {
           gapEl.innerHTML = `<span style="color:var(--warning); font-weight:700;">Hedefe ${Math.abs(diff)} net kaldı</span> (${reqTotal} net)`;
         }
       } else {
-        document.getElementById('uni-sidebar-gap').textContent = `${target.type} • Taban: ~${reqTotal} net`;
+        gapEl.textContent = `${target.type} • Taban: ~${reqTotal} net`;
       }
     }
 
@@ -2855,6 +2860,12 @@
           `;
           row.addEventListener('click', e => {
             if (e.target.closest('[data-set-target]')) {
+              if (state.targetUniId === u.id) {
+                state.targetUniId = null;
+                saveState(); render(); renderUniModal();
+                showToast('🎯 Hedef üniversite seçimi temizlendi.');
+                return;
+              }
               state.targetUniId = u.id;
               state.tytTarget = tot;
               saveState(); render(); renderUniModal();
@@ -2908,6 +2919,7 @@
           <div class="stat-card" style="padding:8px;">Sosyal: <strong>${n.sos}</strong><br/>${diffBadge(mySos, n.sos)}</div>
           <div class="stat-card" style="padding:8px;">Fen: <strong>${n.fen}</strong><br/>${diffBadge(myFen, n.fen)}</div>
         </div>
+        <div class="muted" style="font-size:11px;">Not: Sıralamalar 2025–2021 ÖSYM / YÖK Atlas yerleştirme verileridir. Ders bazlı netler referans ortalamasıdır; Lisans (SAY) bölümlerinde sıralamayı AYT netleri de belirler.</div>
       `;
     }
 

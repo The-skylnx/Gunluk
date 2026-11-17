@@ -1261,14 +1261,21 @@
       <div style="display:flex; flex-direction:column; gap:8px;">
         <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
           <div style="flex:1; min-width:190px; display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:2px 10px;">
+            <input id="uni-search" class="input" placeholder="Üniversite, bölüm veya il yaz..." style="flex:1; border:none; background:transparent; padding:7px 2px; font-size:13px; outline:none; box-shadow:none;" />
             <button id="uni-search-btn" type="button" aria-label="Ara" title="Ara" style="background:none; border:none; padding:6px 2px; margin:0; color:var(--muted); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
-            <input id="uni-search" class="input" placeholder="Üniversite, bölüm veya il yaz..." style="flex:1; border:none; background:transparent; padding:7px 2px; font-size:13px; outline:none; box-shadow:none;" />
           </div>
-          <button id="toggle-add-uni-btn" type="button" class="btn" style="padding:9px 12px;">+ Hedef Ekle</button>
+          <select id="uni-sort-filter" class="input" aria-label="Sıralama" style="padding:8px 10px;">
+            <option value="default">Sırala: Varsayılan</option>
+            <option value="az">A → Z (İsim)</option>
+            <option value="rank">Başarı Sıralaması (En İyi)</option>
+            <option value="net-desc">Net (Yüksek → Düşük)</option>
+            <option value="net-asc">Net (Düşük → Yüksek)</option>
+          </select>
+          <button id="toggle-uni-filters-btn" type="button" class="btn" style="padding:8px 12px;">Filtre</button>
         </div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px;">
+        <div id="uni-filters-panel" class="hidden" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px; align-items:center;">
           <select id="uni-city-filter" class="input" aria-label="İl seçimi">
             <option value="all">Tüm İller</option>
           </select>
@@ -1283,6 +1290,7 @@
             <option value="Uzaktan">Uzaktan Öğretim</option>
             <option value="Açıköğretim">Açıköğretim</option>
           </select>
+          <button id="toggle-add-uni-btn" type="button" class="btn" style="padding:8px 10px;">+ Hedef Ekle</button>
         </div>
       </div>
 
@@ -3412,6 +3420,22 @@
         return true;
       });
 
+      const sortF = document.getElementById('uni-sort-filter').value;
+      const uniBestRank = u => {
+        const raw = (u.years && u.years['2025'] && u.years['2025'] !== '—') ? u.years['2025'] : (u.years && u.years['2024']);
+        const n = parseInt(String(raw || '').replace(/\D/g, ''), 10);
+        return (!n || isNaN(n)) ? 99999999 : n;
+      };
+      if (sortF === 'az') {
+        list.sort((a, b) => a.name.localeCompare(b.name, 'tr') || a.dept.localeCompare(b.dept, 'tr'));
+      } else if (sortF === 'rank') {
+        list.sort((a, b) => uniBestRank(a) - uniBestRank(b));
+      } else if (sortF === 'net-desc') {
+        list.sort((a, b) => uniTotalNet(b) - uniTotalNet(a));
+      } else if (sortF === 'net-asc') {
+        list.sort((a, b) => uniTotalNet(a) - uniTotalNet(b));
+      }
+
       if (previewUniId && !list.some(u => u.id === previewUniId)) {
         previewUniId = null;
       }
@@ -3537,6 +3561,10 @@
     uniModal.addEventListener('click', e => { if (e.target === uniModal) uniModal.classList.add('hidden'); });
     document.getElementById('uni-search-btn').addEventListener('click', runUniSearch);
     document.getElementById('uni-search').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runUniSearch(); } });
+    document.getElementById('toggle-uni-filters-btn').addEventListener('click', () => {
+      document.getElementById('uni-filters-panel').classList.toggle('hidden');
+    });
+    document.getElementById('uni-sort-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-city-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-type-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-mode-filter').addEventListener('change', renderUniModal);

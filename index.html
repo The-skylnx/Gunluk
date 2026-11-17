@@ -1260,11 +1260,12 @@
       <!-- Filtreler & Ekleme -->
       <div style="display:flex; flex-direction:column; gap:8px;">
         <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <input id="uni-search" class="input" placeholder="Üniversite, bölüm veya il yaz..." style="flex:1; min-width:180px; padding:9px 12px; font-size:13px;" />
-          <button id="uni-search-btn" type="button" aria-label="Ara" title="Ara" style="padding:9px 16px; border-radius:9px; border:1px solid var(--border); background:var(--fg); color:var(--bg); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:13.5px; font-weight:700; white-space:nowrap;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span>Ara</span>
-          </button>
+          <div style="flex:1; min-width:190px; display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:2px 10px;">
+            <button id="uni-search-btn" type="button" aria-label="Ara" title="Ara" style="background:none; border:none; padding:6px 2px; margin:0; color:var(--muted); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+            <input id="uni-search" class="input" placeholder="Üniversite, bölüm veya il yaz..." style="flex:1; border:none; background:transparent; padding:7px 2px; font-size:13px; outline:none; box-shadow:none;" />
+          </div>
           <button id="toggle-add-uni-btn" type="button" class="btn" style="padding:9px 12px;">+ Hedef Ekle</button>
         </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px;">
@@ -3237,6 +3238,61 @@
         mode: 'Örgün',
         nets: { tr: 28.0, mat: 19.5, sos: 12.0, fen: 10.0 },
         years: { '2025': '143.234', '2024': '150.546', '2023': '147.491', '2022': '152.437', '2021': '142.214' }
+      },
+      {
+        id: 'odtu_fizik',
+        name: 'Orta Doğu Teknik Üni. (ODTÜ)',
+        dept: 'Fizik (İng.)',
+        city: 'Ankara',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 34.5, mat: 35.0, sos: 16.0, fen: 17.0 },
+        years: { '2025': '15.756', '2024': '15.660', '2023': '21.431', '2022': '—', '2021': '—' }
+      },
+      {
+        id: 'istanbul_fizik_en',
+        name: 'İstanbul Üniversitesi',
+        dept: 'Fizik (İng.)',
+        city: 'İstanbul',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 28.5, mat: 21.5, sos: 12.0, fen: 11.0 },
+        years: { '2025': '119.147', '2024': '131.693', '2023': '148.516', '2022': '—', '2021': '—' }
+      },
+      {
+        id: 'istanbul_fizik_tr',
+        name: 'İstanbul Üniversitesi',
+        dept: 'Fizik',
+        city: 'İstanbul',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 27.5, mat: 18.5, sos: 11.5, fen: 10.0 },
+        years: { '2025': '165.281', '2024': '183.582', '2023': '209.972', '2022': '—', '2021': '—' }
+      },
+      {
+        id: 'ankara_fizik',
+        name: 'Ankara Üniversitesi',
+        dept: 'Fizik',
+        city: 'Ankara',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 28.0, mat: 20.5, sos: 12.0, fen: 10.5 },
+        years: { '2025': '131.150', '2024': '153.860', '2023': '182.110', '2022': '—', '2021': '—' }
+      },
+      {
+        id: 'uludag_fizik',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'Fizik',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 25.0, mat: 14.0, sos: 10.0, fen: 8.0 },
+        years: { '2025': '304.216', '2024': '320.296', '2023': '319.761', '2022': '—', '2021': '—' }
       }
     ];
 
@@ -3322,7 +3378,26 @@
 
       listEl.innerHTML = '';
       if (!list.length) {
-        listEl.innerHTML = '<div class="empty-box">Eşleşen üniversite bulunamadı. <strong>+ Kendi Hedefini Ekle</strong> ile ekleyebilirsin.</div>';
+        const qSafe = escapeHtml(q || '');
+        listEl.innerHTML = `
+          <div class="empty-box" style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;">
+            <div>Kayıtlı devlet üniversitesi listesinde eşleşme bulunamadı.</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <a href="https://yokatlas.yok.gov.tr/tercih-sihirbazi-t4-tablo.php" target="_blank" rel="noopener" class="btn" style="font-size:11.5px; text-decoration:none;">YÖK Atlas'ta Bak ↗</a>
+              <a href="https://www.kariyer.net/universite-tercih-robotu" target="_blank" rel="noopener" class="btn" style="font-size:11.5px; text-decoration:none;">Kariyer.net'te Bak ↗</a>
+              <button type="button" id="quick-prefill-uni-btn" class="btn" style="font-size:11.5px;">+ "${qSafe || 'Bu Bölümü'}" Hedef Olarak Ekle</button>
+            </div>
+          </div>
+        `;
+        const quickBtn = document.getElementById('quick-prefill-uni-btn');
+        if (quickBtn) {
+          quickBtn.addEventListener('click', () => {
+            addUniForm.classList.remove('hidden');
+            if (q) document.getElementById('u-dept').value = q;
+            if (cityF !== 'all') document.getElementById('u-city').value = cityF;
+            document.getElementById('u-name').focus();
+          });
+        }
       } else {
         list.forEach(u => {
           const isTarget = u.id === state.targetUniId;

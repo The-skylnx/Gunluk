@@ -1260,50 +1260,38 @@
       <!-- Filtreler & Ekleme -->
       <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
         <input id="uni-search" class="input" placeholder="🔍 Üniversite, bölüm veya il ara..." style="flex:1; min-width:160px;" />
-        <select id="uni-kind-filter" class="input" aria-label="Üniversite türü">
-          <option value="all">Devlet + Vakıf</option>
-          <option value="Devlet">Devlet</option>
-          <option value="Vakıf">Vakıf (Özel)</option>
-        </select>
         <select id="uni-city-filter" class="input" aria-label="İl seçimi">
           <option value="all">Tüm İller</option>
         </select>
         <select id="uni-type-filter" class="input" aria-label="Program türü">
           <option value="all">Tümü (Ön Lisans + Lisans)</option>
           <option value="Ön Lisans">Ön Lisans (TYT)</option>
-          <option value="Lisans">Lisans (SAY)</option>
+          <option value="Lisans">Lisans</option>
         </select>
         <select id="uni-mode-filter" class="input" aria-label="Öğretim türü">
           <option value="all">Tüm Öğretim Türleri</option>
+          <option value="Örgün">Örgün</option>
           <option value="Uzaktan">Uzaktan Öğretim</option>
           <option value="Açıköğretim">Açıköğretim</option>
-          <option value="Örgün">Örgün</option>
-          <option value="Burslu">Burslu</option>
         </select>
         <button id="toggle-add-uni-btn" type="button" class="btn btn-primary">+ Kendi Hedefini Ekle</button>
       </div>
 
       <!-- Özel Üniversite Ekleme Formu -->
       <form id="add-uni-form" class="inline-panel hidden" style="gap:8px;">
-        <strong style="font-size:12.5px;">Özel Hedef Üniversite / Bölüm Ekle</strong>
+        <strong style="font-size:12.5px;">Devlet Üniversitesi / Bölüm Ekle</strong>
         <div class="form-grid form-grid-3">
-          <input id="u-name" class="input" placeholder="Üniversite (örn: Anadolu Üni.)" required />
+          <input id="u-name" class="input" placeholder="Üniversite (örn: Bursa Uludağ Üni.)" required />
           <input id="u-dept" class="input" placeholder="Bölüm (örn: Bilgisayar Prog.)" required />
-          <input id="u-city" class="input" placeholder="İl (örn: Eskişehir)" required />
+          <input id="u-city" class="input" placeholder="İl (örn: Bursa)" required />
         </div>
-        <div class="form-grid form-grid-2">
-          <select id="u-kind" class="input">
-            <option value="Devlet">Devlet Üniversitesi</option>
-            <option value="Vakıf">Vakıf (Özel) Üniversitesi</option>
-          </select>
+        <div class="form-grid form-grid-3">
           <select id="u-type" class="input">
             <option value="Ön Lisans">Ön Lisans (TYT)</option>
-            <option value="Lisans">Lisans (SAY)</option>
+            <option value="Lisans">Lisans</option>
           </select>
-        </div>
-        <div class="form-grid form-grid-2">
-          <input id="u-mode" class="input" placeholder="Öğretim (Uzaktan / Örgün / Burslu)" value="Uzaktan Öğretim" />
-          <input id="u-ranks" class="input" placeholder="2025-2021 Sıralamalar (örn: 950000, 1105256)" />
+          <input id="u-mode" class="input" placeholder="Öğretim (Örgün / Uzaktan / AÖF)" value="Örgün" />
+          <input id="u-ranks" class="input" placeholder="2025-2021 Sıralamalar (örn: 95000, 110525)" />
         </div>
         <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
           <input id="u-tr" class="input" type="number" step="0.5" placeholder="TR Net" required />
@@ -2845,50 +2833,6 @@
         years: { '2025': '46.156', '2024': '35.288', '2023': '25.681', '2022': '33.483', '2021': '—' }
       },
       {
-        id: 'bau_yazilim',
-        name: 'Bahçeşehir Üniversitesi',
-        dept: 'Yazılım Mühendisliği (İng.)',
-        city: 'İstanbul',
-        kind: 'Vakıf',
-        type: 'Lisans',
-        mode: 'Burslu',
-        nets: { tr: 33.5, mat: 33.0, sos: 15.0, fen: 16.0 },
-        years: { '2025': '32.862', '2024': '14.245', '2023': '6.884', '2022': '5.678', '2021': '7.180' }
-      },
-      {
-        id: 'ted_yazilim',
-        name: 'TED Üniversitesi',
-        dept: 'Yazılım Mühendisliği (İng.)',
-        city: 'Ankara',
-        kind: 'Vakıf',
-        type: 'Lisans',
-        mode: 'Burslu',
-        nets: { tr: 33.0, mat: 32.0, sos: 14.5, fen: 15.5 },
-        years: { '2025': '29.359', '2024': '15.359', '2023': '13.034', '2022': '32.106', '2021': '42.142' }
-      },
-      {
-        id: 'cankaya_yazilim',
-        name: 'Çankaya Üniversitesi',
-        dept: 'Yazılım Mühendisliği (İng.)',
-        city: 'Ankara',
-        kind: 'Vakıf',
-        type: 'Lisans',
-        mode: 'Burslu',
-        nets: { tr: 31.5, mat: 29.5, sos: 13.5, fen: 14.0 },
-        years: { '2025': '48.552', '2024': '36.278', '2023': '18.372', '2022': '38.923', '2021': '45.300' }
-      },
-      {
-        id: 'yasar_yazilim',
-        name: 'Yaşar Üniversitesi',
-        dept: 'Yazılım Mühendisliği (İng.)',
-        city: 'İzmir',
-        kind: 'Vakıf',
-        type: 'Lisans',
-        mode: 'Burslu',
-        nets: { tr: 31.0, mat: 28.5, sos: 13.5, fen: 13.5 },
-        years: { '2025': '56.448', '2024': '56.309', '2023': '21.748', '2022': '20.329', '2021': '—' }
-      },
-      {
         id: 'uludag_bilgisayar',
         name: 'Bursa Uludağ Üniversitesi',
         dept: 'Bilgisayar Mühendisliği',
@@ -3129,6 +3073,160 @@
         mode: 'Örgün',
         nets: { tr: 27.5, mat: 19.0, sos: 11.5, fen: 10.0 },
         years: { '2025': '153.949', '2024': '188.384', '2023': '190.087', '2022': '220.114', '2021': '235.075' }
+      },
+      {
+        id: 'uludag_tip',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'Tıp Fakültesi',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 35.5, mat: 36.0, sos: 16.5, fen: 17.5 },
+        years: { '2025': '9.803', '2024': '10.165', '2023': '10.339', '2022': '—', '2021': '8.401' }
+      },
+      {
+        id: 'uludag_dis',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'Diş Hekimliği',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 33.5, mat: 32.5, sos: 15.0, fen: 16.0 },
+        years: { '2025': '27.058', '2024': '30.722', '2023': '30.855', '2022': '—', '2021': '25.619' }
+      },
+      {
+        id: 'uludag_hukuk',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'Hukuk (EA)',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 33.5, mat: 26.0, sos: 16.0, fen: 5.0 },
+        years: { '2025': '12.546', '2024': '24.427', '2023': '15.492', '2022': '—', '2021': '26.231' }
+      },
+      {
+        id: 'uludag_endustri',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'Endüstri Mühendisliği',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 31.5, mat: 28.0, sos: 13.5, fen: 13.5 },
+        years: { '2025': '57.412', '2024': '58.181', '2023': '54.761', '2022': '60.165', '2021': '—' }
+      },
+      {
+        id: 'uludag_eem',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'Elektrik-Elektronik Mühendisliği',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 31.5, mat: 28.5, sos: 13.5, fen: 13.5 },
+        years: { '2025': '54.254', '2024': '60.036', '2023': '57.977', '2022': '63.082', '2021': '69.247' }
+      },
+      {
+        id: 'uludag_insaat',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'İnşaat Mühendisliği',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 27.5, mat: 19.0, sos: 11.5, fen: 10.0 },
+        years: { '2025': '153.397', '2024': '186.346', '2023': '207.148', '2022': '224.083', '2021': '—' }
+      },
+      {
+        id: 'uludag_psikoloji',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'Psikoloji (EA)',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 31.5, mat: 20.5, sos: 15.0, fen: 4.5 },
+        years: { '2025': '40.253', '2024': '51.367', '2023': '40.167', '2022': '—', '2021': '48.227' }
+      },
+      {
+        id: 'uludag_sinif',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'Sınıf Öğretmenliği (EA)',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 30.5, mat: 18.0, sos: 14.5, fen: 4.0 },
+        years: { '2025': '61.511', '2024': '73.788', '2023': '68.669', '2022': '—', '2021': '—' }
+      },
+      {
+        id: 'uludag_isletme',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'İşletme (EA)',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 27.5, mat: 13.5, sos: 13.0, fen: 3.0 },
+        years: { '2025': '161.680', '2024': '236.979', '2023': '288.529', '2022': '—', '2021': '—' }
+      },
+      {
+        id: 'uludag_acil',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'İlk ve Acil Yardım',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Ön Lisans',
+        mode: 'Örgün',
+        nets: { tr: 28.5, mat: 19.5, sos: 12.0, fen: 9.5 },
+        years: { '2025': '275.590', '2024': '353.382', '2023': '354.162', '2022': '340.970', '2021': '295.692' }
+      },
+      {
+        id: 'uludag_tibbi_dok',
+        name: 'Bursa Uludağ Üniversitesi',
+        dept: 'Tıbbi Dokümantasyon ve Sekreterlik',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Ön Lisans',
+        mode: 'Örgün',
+        nets: { tr: 26.5, mat: 16.5, sos: 11.0, fen: 7.5 },
+        years: { '2025': '355.577', '2024': '459.525', '2023': '497.429', '2022': '566.244', '2021': '563.567' }
+      },
+      {
+        id: 'btu_endustri',
+        name: 'Bursa Teknik Üniversitesi',
+        dept: 'Endüstri Mühendisliği',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 30.5, mat: 25.5, sos: 13.0, fen: 12.5 },
+        years: { '2025': '71.462', '2024': '78.799', '2023': '70.969', '2022': '81.265', '2021': '—' }
+      },
+      {
+        id: 'btu_makine',
+        name: 'Bursa Teknik Üniversitesi',
+        dept: 'Makine Mühendisliği (%30 İng.)',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 30.0, mat: 24.5, sos: 12.5, fen: 12.0 },
+        years: { '2025': '77.776', '2024': '93.354', '2023': '96.641', '2022': '114.027', '2021': '—' }
+      },
+      {
+        id: 'btu_mimarlik',
+        name: 'Bursa Teknik Üniversitesi',
+        dept: 'Mimarlık',
+        city: 'Bursa',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 28.0, mat: 19.5, sos: 12.0, fen: 10.0 },
+        years: { '2025': '143.234', '2024': '150.546', '2023': '147.491', '2022': '152.437', '2021': '142.214' }
       }
     ];
 
@@ -3179,12 +3277,10 @@
     function renderUniModal() {
       syncUniCityFilter();
       const q = (document.getElementById('uni-search').value || '').trim().toLowerCase();
-      const kindF = document.getElementById('uni-kind-filter').value;
       const cityF = document.getElementById('uni-city-filter').value;
       const typeF = document.getElementById('uni-type-filter').value;
       const modeF = document.getElementById('uni-mode-filter').value;
       const list = getAllUnis().filter(u => {
-        if (kindF !== 'all' && (u.kind || 'Devlet') !== kindF) return false;
         if (cityF !== 'all' && u.city !== cityF) return false;
         if (typeF !== 'all' && u.type !== typeF) return false;
         if (modeF !== 'all' && !(u.mode || '').toLowerCase().includes(modeF.toLowerCase())) return false;
@@ -3285,7 +3381,6 @@
     document.getElementById('close-uni-modal-btn').addEventListener('click', () => uniModal.classList.add('hidden'));
     uniModal.addEventListener('click', e => { if (e.target === uniModal) uniModal.classList.add('hidden'); });
     document.getElementById('uni-search').addEventListener('input', renderUniModal);
-    document.getElementById('uni-kind-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-city-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-type-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-mode-filter').addEventListener('change', renderUniModal);
@@ -3304,7 +3399,7 @@
         name: document.getElementById('u-name').value.trim(),
         dept: document.getElementById('u-dept').value.trim(),
         city: document.getElementById('u-city').value.trim(),
-        kind: document.getElementById('u-kind').value,
+        kind: 'Devlet',
         type: document.getElementById('u-type').value,
         mode: document.getElementById('u-mode').value.trim() || 'Örgün',
         nets: {

@@ -1274,8 +1274,16 @@
           <option value="Uzaktan">Uzaktan Öğretim</option>
           <option value="Açıköğretim">Açıköğretim</option>
         </select>
-        <button id="toggle-add-uni-btn" type="button" class="btn btn-primary">+ Kendi Hedefini Ekle</button>
+        <button id="uni-search-btn" type="button" class="btn btn-primary">🔍 Ara</button>
+        <button id="toggle-add-uni-btn" type="button" class="btn">+ Kendi Hedefini Ekle</button>
       </div>
+      <details style="font-size:11.5px;">
+        <summary class="muted" style="cursor:pointer; user-select:none;">🌐 Canlı YÖK Atlas Proxy Ayarı <span id="uni-live-status"></span></summary>
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px;">
+          <input id="uni-proxy-url" class="input" placeholder="Cloudflare Worker URL (örn: https://yokatlas-proxy.workers.dev)" style="flex:1; min-width:220px;" />
+          <button id="save-uni-proxy-btn" type="button" class="btn">Kaydet</button>
+        </div>
+      </details>
 
       <!-- Özel Üniversite Ekleme Formu -->
       <form id="add-uni-form" class="inline-panel hidden" style="gap:8px;">
@@ -1436,7 +1444,8 @@
         tytExams: [],
         yksProgram: [], // { id, day (0..6), time, subject, topic, doneWeekKey }
         targetUniId: null,
-        customUnis: []
+        customUnis: [],
+        yokProxyUrl: ''
       };
     }
 
@@ -1481,6 +1490,7 @@
       if (!Array.isArray(merged.yksProgram)) merged.yksProgram = [];
       if (!Array.isArray(merged.customUnis)) merged.customUnis = [];
       if (merged.targetUniId === undefined) merged.targetUniId = null;
+      if (typeof merged.yokProxyUrl !== 'string') merged.yokProxyUrl = '';
       return rollDaysIfNeeded(merged);
     }
 
@@ -3230,8 +3240,16 @@
       }
     ];
 
+    let liveUniResults = [];
+
     function getAllUnis() {
-      return [...(state.customUnis || []), ...DEFAULT_UNIS];
+      const seen = new Set();
+      return [...(state.customUnis || []), ...liveUniResults, ...DEFAULT_UNIS].filter(u => {
+        const key = `${(u.name || '').toLowerCase()}|${(u.dept || '').toLowerCase()}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
     }
 
     function uniTotalNet(u) {
@@ -3376,11 +3394,79 @@
       `;
     }
 
-    document.getElementById('open-uni-modal-btn').addEventListener('click', () => { renderUniModal(); uniModal.classList.remove('hidden'); });
-    document.getElementById('uni-sidebar-card').addEventListener('click', () => { renderUniModal(); uniModal.classList.remove('hidden'); });
+    async function runUniSearch() {
+      renderUniModal();
+      const proxy = (state.yokProxyUrl || '').trim().replace(/\/+$/, '');
+      const statusEl = document.getElementById('uni-live-status');
+      if (!proxy) {
+        statusEl.textContent = '(Yerel liste filtrelendi — canlı çekim için Proxy URL ekle)';
+        return;
+      }
+      const q = (document.getElementById('uni-search').value || '').trim();
+      const cityF = document.getElementById('uni-city-filter').value;
+      const typeF = document.getElementById('uni-type-filter').value;
+      statusEl.textContent = '⏳ YÖK Atlas sorgulanıyor...';
+      try {
+        const resp = await fetch(`${proxy}?path=/api/tercih-kilavuz/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            programAdi: q,
+            sehirAdi: cityF === 'all' ? '' : cityF,
+            universiteTuru: 'Devlet',
+            programTuru: typeF === 'all' ? '' : typeF,
+            page: 0,
+            size: 25
+          })
+        });
+        const text = await resp.text();
+        if (!resp.ok || text.trim().startsWith('<')) {
+          statusEl.textContent = '⚠️ YÖK Atlas isteği engelledi veya yanıt vermedi (yerel liste gösteriliyor).';
+          return;
+        }
+        const data = JSON.parse(text);
+        const rows = Array.isArray(data) ? data : (data.content || data.data || data.results || []);
+        liveUniResults = rows.slice(0, 25).map((r, idx) => ({
+          id: `live_${r.yopKodu || r.id || idx}`,
+          name: r.universiteAdi || r.uniAdi || 'Üniversite',
+          dept: r.programAdi || r.bolumAdi || q || 'Bölüm',
+          city: r.sehirAdi || (cityF !== 'all' ? cityF : ''),
+          kind: 'Devlet',
+          type: (r.programTuru || typeF || 'Lisans').includes('Ön') ? 'Ön Lisans' : 'Lisans',
+          mode: r.ogretimTuru || 'Örgün',
+          nets: { tr: 25, mat: 15, sos: 10, fen: 5 },
+          years: {
+            '2025': String(r.bs2025 || r.basariSirasi || '—'),
+            '2024': String(r.bs2024 || '—'),
+            '2023': String(r.bs2023 || '—'),
+            '2022': String(r.bs2022 || '—'),
+            '2021': String(r.bs2021 || '—')
+          }
+        }));
+        statusEl.textContent = `✅ ${liveUniResults.length} canlı sonuç getirildi`;
+        renderUniModal();
+      } catch (err) {
+        statusEl.textContent = '⚠️ Proxy bağlantı hatası (yerel liste gösteriliyor).';
+      }
+    }
+
+    document.getElementById('open-uni-modal-btn').addEventListener('click', () => {
+      document.getElementById('uni-proxy-url').value = state.yokProxyUrl || '';
+      renderUniModal(); uniModal.classList.remove('hidden');
+    });
+    document.getElementById('uni-sidebar-card').addEventListener('click', () => {
+      document.getElementById('uni-proxy-url').value = state.yokProxyUrl || '';
+      renderUniModal(); uniModal.classList.remove('hidden');
+    });
     document.getElementById('close-uni-modal-btn').addEventListener('click', () => uniModal.classList.add('hidden'));
     uniModal.addEventListener('click', e => { if (e.target === uniModal) uniModal.classList.add('hidden'); });
-    document.getElementById('uni-search').addEventListener('input', renderUniModal);
+    document.getElementById('uni-search-btn').addEventListener('click', runUniSearch);
+    document.getElementById('uni-search').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runUniSearch(); } });
+    document.getElementById('save-uni-proxy-btn').addEventListener('click', () => {
+      state.yokProxyUrl = document.getElementById('uni-proxy-url').value.trim();
+      saveState();
+      showToast('🌐 YÖK Atlas Proxy URL kaydedildi.');
+    });
     document.getElementById('uni-city-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-type-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-mode-filter').addEventListener('change', renderUniModal);

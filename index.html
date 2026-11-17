@@ -1261,7 +1261,10 @@
       <div style="display:flex; flex-direction:column; gap:8px;">
         <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
           <input id="uni-search" class="input" placeholder="Üniversite, bölüm veya il yaz..." style="flex:1; min-width:180px; padding:9px 12px; font-size:13px;" />
-          <button id="uni-search-btn" type="button" style="padding:9px 22px; font-size:13.5px; font-weight:700; border-radius:9px; border:1px solid var(--border); background:var(--text); color:var(--bg); cursor:pointer; white-space:nowrap;">Ara</button>
+          <button id="uni-search-btn" type="button" aria-label="Ara" title="Ara" style="padding:9px 16px; border-radius:9px; border:1px solid var(--border); background:var(--fg); color:var(--bg); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:13.5px; font-weight:700; white-space:nowrap;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>Ara</span>
+          </button>
           <button id="toggle-add-uni-btn" type="button" class="btn" style="padding:9px 12px;">+ Hedef Ekle</button>
         </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px;">
@@ -3279,6 +3282,7 @@
     }
 
     let previewUniId = null;
+    let hasUniSearched = false;
     const uniModal = document.getElementById('uni-modal');
 
     function syncUniCityFilter() {
@@ -3291,6 +3295,15 @@
 
     function renderUniModal() {
       syncUniCityFilter();
+      const listEl = document.getElementById('uni-list');
+      const detailEl = document.getElementById('uni-detail-panel');
+      if (!hasUniSearched) {
+        listEl.innerHTML = '';
+        listEl.classList.add('hidden');
+        detailEl.classList.add('hidden');
+        return;
+      }
+      listEl.classList.remove('hidden');
       const q = (document.getElementById('uni-search').value || '').trim().toLowerCase();
       const cityF = document.getElementById('uni-city-filter').value;
       const typeF = document.getElementById('uni-type-filter').value;
@@ -3303,11 +3316,10 @@
         return true;
       });
 
-      if (!previewUniId || !list.some(u => u.id === previewUniId)) {
-        previewUniId = (list.find(u => u.id === state.targetUniId) || list[0] || {}).id || null;
+      if (previewUniId && !list.some(u => u.id === previewUniId)) {
+        previewUniId = null;
       }
 
-      const listEl = document.getElementById('uni-list');
       listEl.innerHTML = '';
       if (!list.length) {
         listEl.innerHTML = '<div class="empty-box">Eşleşen üniversite bulunamadı. <strong>+ Kendi Hedefini Ekle</strong> ile ekleyebilirsin.</div>';
@@ -3347,8 +3359,7 @@
         });
       }
 
-      const detailEl = document.getElementById('uni-detail-panel');
-      const u = getAllUnis().find(x => x.id === previewUniId);
+      const u = previewUniId ? getAllUnis().find(x => x.id === previewUniId) : null;
       if (!u) { detailEl.classList.add('hidden'); return; }
       detailEl.classList.remove('hidden');
 
@@ -3392,11 +3403,13 @@
     }
 
     function runUniSearch() {
+      hasUniSearched = true;
+      previewUniId = null;
       renderUniModal();
     }
 
-    document.getElementById('open-uni-modal-btn').addEventListener('click', () => { renderUniModal(); uniModal.classList.remove('hidden'); });
-    document.getElementById('uni-sidebar-card').addEventListener('click', () => { renderUniModal(); uniModal.classList.remove('hidden'); });
+    document.getElementById('open-uni-modal-btn').addEventListener('click', () => { hasUniSearched = false; previewUniId = null; renderUniModal(); uniModal.classList.remove('hidden'); });
+    document.getElementById('uni-sidebar-card').addEventListener('click', () => { hasUniSearched = false; previewUniId = null; renderUniModal(); uniModal.classList.remove('hidden'); });
     document.getElementById('close-uni-modal-btn').addEventListener('click', () => uniModal.classList.add('hidden'));
     uniModal.addEventListener('click', e => { if (e.target === uniModal) uniModal.classList.add('hidden'); });
     document.getElementById('uni-search-btn').addEventListener('click', runUniSearch);

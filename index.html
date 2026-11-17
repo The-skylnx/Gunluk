@@ -1260,6 +1260,11 @@
       <!-- Filtreler & Ekleme -->
       <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
         <input id="uni-search" class="input" placeholder="🔍 Üniversite, bölüm veya il ara..." style="flex:1; min-width:160px;" />
+        <select id="uni-kind-filter" class="input" aria-label="Üniversite türü">
+          <option value="all">Devlet + Vakıf</option>
+          <option value="Devlet">Devlet</option>
+          <option value="Vakıf">Vakıf (Özel)</option>
+        </select>
         <select id="uni-city-filter" class="input" aria-label="İl seçimi">
           <option value="all">Tüm İller</option>
         </select>
@@ -1270,9 +1275,10 @@
         </select>
         <select id="uni-mode-filter" class="input" aria-label="Öğretim türü">
           <option value="all">Tüm Öğretim Türleri</option>
-          <option value="Uzaktan Öğretim">Uzaktan Öğretim</option>
-          <option value="Örgün">Örgün (Devlet)</option>
-          <option value="Burslu">Burslu (Vakıf)</option>
+          <option value="Uzaktan">Uzaktan Öğretim</option>
+          <option value="Açıköğretim">Açıköğretim</option>
+          <option value="Örgün">Örgün</option>
+          <option value="Burslu">Burslu</option>
         </select>
         <button id="toggle-add-uni-btn" type="button" class="btn btn-primary">+ Kendi Hedefini Ekle</button>
       </div>
@@ -1285,11 +1291,17 @@
           <input id="u-dept" class="input" placeholder="Bölüm (örn: Bilgisayar Prog.)" required />
           <input id="u-city" class="input" placeholder="İl (örn: Eskişehir)" required />
         </div>
-        <div class="form-grid form-grid-3">
+        <div class="form-grid form-grid-2">
+          <select id="u-kind" class="input">
+            <option value="Devlet">Devlet Üniversitesi</option>
+            <option value="Vakıf">Vakıf (Özel) Üniversitesi</option>
+          </select>
           <select id="u-type" class="input">
             <option value="Ön Lisans">Ön Lisans (TYT)</option>
             <option value="Lisans">Lisans (SAY)</option>
           </select>
+        </div>
+        <div class="form-grid form-grid-2">
           <input id="u-mode" class="input" placeholder="Öğretim (Uzaktan / Örgün / Burslu)" value="Uzaktan Öğretim" />
           <input id="u-ranks" class="input" placeholder="2025-2021 Sıralamalar (örn: 950000, 1105256)" />
         </div>
@@ -2749,6 +2761,7 @@
         name: 'Çukurova Üniversitesi',
         dept: 'Bilgisayar Programcılığı',
         city: 'Adana',
+        kind: 'Devlet',
         type: 'Ön Lisans',
         mode: 'Uzaktan Öğretim',
         nets: { tr: 23.5, mat: 11.5, sos: 9.0, fen: 4.5 },
@@ -2759,18 +2772,75 @@
         name: 'Bandırma Onyedi Eylül Üni.',
         dept: 'Bilgisayar Programcılığı',
         city: 'Balıkesir',
+        kind: 'Devlet',
         type: 'Ön Lisans',
         mode: 'Uzaktan Öğretim',
         nets: { tr: 21.0, mat: 8.5, sos: 8.0, fen: 3.5 },
         years: { '2025': '1.321.079', '2024': '1.469.951', '2023': '1.180.073', '2022': '1.346.183', '2021': '—' }
       },
       {
+        id: 'anadolu_aof',
+        name: 'Anadolu Üniversitesi',
+        dept: 'Bilgisayar Programcılığı',
+        city: 'Eskişehir',
+        kind: 'Devlet',
+        type: 'Ön Lisans',
+        mode: 'Açıköğretim',
+        nets: { tr: 24.5, mat: 12.0, sos: 9.5, fen: 4.5 },
+        years: { '2025': '927.169', '2024': '1.020.716', '2023': '462.687', '2022': '565.285', '2021': '764.075' }
+      },
+      {
+        id: 'istanbul_auzef',
+        name: 'İstanbul Üniversitesi',
+        dept: 'Bilgisayar Programcılığı',
+        city: 'İstanbul',
+        kind: 'Devlet',
+        type: 'Ön Lisans',
+        mode: 'Açıköğretim (AUZEF)',
+        nets: { tr: 23.5, mat: 11.0, sos: 9.0, fen: 4.5 },
+        years: { '2025': '1.008.646', '2024': '1.203.823', '2023': '521.124', '2022': '699.958', '2021': '—' }
+      },
+      {
+        id: 'odtu_bilgisayar',
+        name: 'Orta Doğu Teknik Üni. (ODTÜ)',
+        dept: 'Bilgisayar Mühendisliği (İng.)',
+        city: 'Ankara',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 36.5, mat: 38.0, sos: 17.5, fen: 18.5 },
+        years: { '2025': '1.204', '2024': '945', '2023': '716', '2022': '878', '2021': '1.048' }
+      },
+      {
+        id: 'itu_bilgisayar',
+        name: 'İstanbul Teknik Üni. (İTÜ)',
+        dept: 'Bilgisayar Mühendisliği (İng.)',
+        city: 'İstanbul',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 36.0, mat: 37.5, sos: 17.0, fen: 18.0 },
+        years: { '2025': '1.435', '2024': '1.348', '2023': '1.147', '2022': '1.179', '2021': '2.454' }
+      },
+      {
+        id: 'ege_bilgisayar',
+        name: 'Ege Üniversitesi',
+        dept: 'Bilgisayar Mühendisliği (İng.)',
+        city: 'İzmir',
+        kind: 'Devlet',
+        type: 'Lisans',
+        mode: 'Örgün',
+        nets: { tr: 33.5, mat: 32.5, sos: 15.0, fen: 16.0 },
+        years: { '2025': '29.487', '2024': '17.383', '2023': '11.627', '2022': '13.889', '2021': '27.645' }
+      },
+      {
         id: 'ankara_yazilim',
         name: 'Ankara Üniversitesi',
         dept: 'Yazılım Mühendisliği',
         city: 'Ankara',
+        kind: 'Devlet',
         type: 'Lisans',
-        mode: 'Örgün (Devlet)',
+        mode: 'Örgün',
         nets: { tr: 32.5, mat: 30.0, sos: 15.0, fen: 14.25 },
         years: { '2025': '46.156', '2024': '35.288', '2023': '25.681', '2022': '33.483', '2021': '—' }
       },
@@ -2779,6 +2849,7 @@
         name: 'Bahçeşehir Üniversitesi',
         dept: 'Yazılım Mühendisliği (İng.)',
         city: 'İstanbul',
+        kind: 'Vakıf',
         type: 'Lisans',
         mode: 'Burslu',
         nets: { tr: 33.5, mat: 33.0, sos: 15.0, fen: 16.0 },
@@ -2789,6 +2860,7 @@
         name: 'TED Üniversitesi',
         dept: 'Yazılım Mühendisliği (İng.)',
         city: 'Ankara',
+        kind: 'Vakıf',
         type: 'Lisans',
         mode: 'Burslu',
         nets: { tr: 33.0, mat: 32.0, sos: 14.5, fen: 15.5 },
@@ -2799,10 +2871,22 @@
         name: 'Çankaya Üniversitesi',
         dept: 'Yazılım Mühendisliği (İng.)',
         city: 'Ankara',
+        kind: 'Vakıf',
         type: 'Lisans',
         mode: 'Burslu',
         nets: { tr: 31.5, mat: 29.5, sos: 13.5, fen: 14.0 },
         years: { '2025': '48.552', '2024': '36.278', '2023': '18.372', '2022': '38.923', '2021': '45.300' }
+      },
+      {
+        id: 'yasar_yazilim',
+        name: 'Yaşar Üniversitesi',
+        dept: 'Yazılım Mühendisliği (İng.)',
+        city: 'İzmir',
+        kind: 'Vakıf',
+        type: 'Lisans',
+        mode: 'Burslu',
+        nets: { tr: 31.0, mat: 28.5, sos: 13.5, fen: 13.5 },
+        years: { '2025': '56.448', '2024': '56.309', '2023': '21.748', '2022': '20.329', '2021': '—' }
       }
     ];
 
@@ -2853,10 +2937,12 @@
     function renderUniModal() {
       syncUniCityFilter();
       const q = (document.getElementById('uni-search').value || '').trim().toLowerCase();
+      const kindF = document.getElementById('uni-kind-filter').value;
       const cityF = document.getElementById('uni-city-filter').value;
       const typeF = document.getElementById('uni-type-filter').value;
       const modeF = document.getElementById('uni-mode-filter').value;
       const list = getAllUnis().filter(u => {
+        if (kindF !== 'all' && (u.kind || 'Devlet') !== kindF) return false;
         if (cityF !== 'all' && u.city !== cityF) return false;
         if (typeF !== 'all' && u.type !== typeF) return false;
         if (modeF !== 'all' && !(u.mode || '').toLowerCase().includes(modeF.toLowerCase())) return false;
@@ -2883,7 +2969,7 @@
           row.innerHTML = `
             <div style="min-width:0;">
               <div style="font-size:13px; font-weight:700;">${isTarget ? '⭐ ' : ''}${escapeHtml(u.name)} — ${escapeHtml(u.dept)}</div>
-              <div class="muted" style="font-size:11.5px;">${u.city ? `📍 ${escapeHtml(u.city)} • ` : ''}${escapeHtml(u.type)} • ${escapeHtml(u.mode || '')} • Tahmini Taban: <strong class="mono">${tot} net</strong></div>
+              <div class="muted" style="font-size:11.5px;">${u.city ? `📍 ${escapeHtml(u.city)} • ` : ''}${u.kind ? `${escapeHtml(u.kind)} • ` : ''}${escapeHtml(u.type)} • ${escapeHtml(u.mode || '')} • Tahmini Taban: <strong class="mono">${tot} net</strong></div>
             </div>
             <button type="button" class="btn ${isTarget ? 'btn-primary' : ''}" data-set-target="1" style="padding:4px 9px; font-size:11.5px;">${isTarget ? 'Hedefim ✓' : 'Hedef Yap'}</button>
           `;
@@ -2937,7 +3023,7 @@
       detailEl.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
           <strong style="font-size:13.5px;">📊 ${escapeHtml(u.name)} — ${escapeHtml(u.dept)}</strong>
-          <span class="badge-area">${u.city ? `📍 ${escapeHtml(u.city)} • ` : ''}${escapeHtml(u.type)} • ${tot} Taban Net</span>
+          <span class="badge-area">${u.city ? `📍 ${escapeHtml(u.city)} • ` : ''}${u.kind ? `${escapeHtml(u.kind)} • ` : ''}${escapeHtml(u.type)} • ${tot} Taban Net</span>
         </div>
         <div style="font-size:11.5px; font-weight:700;" class="muted">2025 – 2021 Başarı Sıralamaları</div>
         <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;">${yRows}</div>
@@ -2957,6 +3043,7 @@
     document.getElementById('close-uni-modal-btn').addEventListener('click', () => uniModal.classList.add('hidden'));
     uniModal.addEventListener('click', e => { if (e.target === uniModal) uniModal.classList.add('hidden'); });
     document.getElementById('uni-search').addEventListener('input', renderUniModal);
+    document.getElementById('uni-kind-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-city-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-type-filter').addEventListener('change', renderUniModal);
     document.getElementById('uni-mode-filter').addEventListener('change', renderUniModal);
@@ -2975,6 +3062,7 @@
         name: document.getElementById('u-name').value.trim(),
         dept: document.getElementById('u-dept').value.trim(),
         city: document.getElementById('u-city').value.trim(),
+        kind: document.getElementById('u-kind').value,
         type: document.getElementById('u-type').value,
         mode: document.getElementById('u-mode').value.trim() || 'Örgün',
         nets: {

@@ -1349,6 +1349,7 @@
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
+  <script src="./universiteler.js"></script>
   <script>
     /* =====================================================================
        VARSAYIMLAR & MİMARİ NOTLAR:
@@ -3296,12 +3297,51 @@
       }
     ];
 
-    let liveUniResults = [];
+    function estimateNetsFromRank(type, rankStr) {
+      const r = parseInt(String(rankStr || '').replace(/\D/g, ''), 10);
+      if (!r || isNaN(r)) return { tr: 25, mat: 15, sos: 10, fen: 5 };
+      if (type === 'Ön Lisans') {
+        if (r <= 300000) return { tr: 28, mat: 18, sos: 12, fen: 8 };
+        if (r <= 600000) return { tr: 25, mat: 14, sos: 10, fen: 6 };
+        if (r <= 1000000) return { tr: 23, mat: 11, sos: 9, fen: 4.5 };
+        return { tr: 20, mat: 8, sos: 8, fen: 3.5 };
+      }
+      if (r <= 15000) return { tr: 35, mat: 35, sos: 16, fen: 17 };
+      if (r <= 50000) return { tr: 32, mat: 30, sos: 14, fen: 14 };
+      if (r <= 120000) return { tr: 29, mat: 23, sos: 12.5, fen: 11.5 };
+      if (r <= 250000) return { tr: 27, mat: 17, sos: 11.5, fen: 9 };
+      return { tr: 24, mat: 12, sos: 10, fen: 6 };
+    }
+
+    let _cachedExtUnis = null;
+    function getExternalUnis() {
+      if (_cachedExtUnis) return _cachedExtUnis;
+      const raw = Array.isArray(window.YOK_ALL_UNIS) ? window.YOK_ALL_UNIS : [];
+      _cachedExtUnis = raw.map(x => ({
+        id: 'yok_' + x.i,
+        name: x.n,
+        dept: x.d,
+        city: x.c,
+        kind: 'Devlet',
+        type: x.t,
+        mode: x.m,
+        puanTuru: x.p || '',
+        nets: estimateNetsFromRank(x.t, x.y && x.y[1]),
+        years: {
+          '2025': (x.y && x.y[0]) || '—',
+          '2024': (x.y && x.y[1]) || '—',
+          '2023': (x.y && x.y[2]) || '—',
+          '2022': (x.y && x.y[3]) || '—',
+          '2021': (x.y && x.y[4]) || '—'
+        }
+      }));
+      return _cachedExtUnis;
+    }
 
     function getAllUnis() {
       const seen = new Set();
-      return [...(state.customUnis || []), ...liveUniResults, ...DEFAULT_UNIS].filter(u => {
-        const key = `${(u.name || '').toLowerCase()}|${(u.dept || '').toLowerCase()}`;
+      return [...(state.customUnis || []), ...DEFAULT_UNIS, ...getExternalUnis()].filter(u => {
+        const key = `${(u.name || '').toLocaleLowerCase('tr-TR')}|${(u.dept || '').toLocaleLowerCase('tr-TR')}`;
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
@@ -3360,15 +3400,15 @@
         return;
       }
       listEl.classList.remove('hidden');
-      const q = (document.getElementById('uni-search').value || '').trim().toLowerCase();
+      const q = (document.getElementById('uni-search').value || '').trim().toLocaleLowerCase('tr-TR');
       const cityF = document.getElementById('uni-city-filter').value;
       const typeF = document.getElementById('uni-type-filter').value;
       const modeF = document.getElementById('uni-mode-filter').value;
       const list = getAllUnis().filter(u => {
         if (cityF !== 'all' && u.city !== cityF) return false;
         if (typeF !== 'all' && u.type !== typeF) return false;
-        if (modeF !== 'all' && !(u.mode || '').toLowerCase().includes(modeF.toLowerCase())) return false;
-        if (q && !u.name.toLowerCase().includes(q) && !u.dept.toLowerCase().includes(q) && !(u.city || '').toLowerCase().includes(q)) return false;
+        if (modeF !== 'all' && !(u.mode || '').toLocaleLowerCase('tr-TR').includes(modeF.toLocaleLowerCase('tr-TR'))) return false;
+        if (q && !u.name.toLocaleLowerCase('tr-TR').includes(q) && !u.dept.toLocaleLowerCase('tr-TR').includes(q) && !(u.city || '').toLocaleLowerCase('tr-TR').includes(q)) return false;
         return true;
       });
 
@@ -3399,7 +3439,15 @@
           });
         }
       } else {
-        list.forEach(u => {
+        const shown = list.slice(0, 60);
+        if (list.length > 60) {
+          const info = document.createElement('div');
+          info.className = 'muted';
+          info.style.cssText = 'font-size:11.5px; padding:2px 4px;';
+          info.textContent = `${list.length} eşleşmeden ilk 60 tanesi gösteriliyor. İl veya bölüm adıyla daraltabilirsin.`;
+          listEl.appendChild(info);
+        }
+        shown.forEach(u => {
           const isTarget = u.id === state.targetUniId;
           const isSel = u.id === previewUniId;
           const tot = uniTotalNet(u);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gunluk-cache-v3';
+const CACHE_NAME = 'gunluk-cache-v4';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -20,6 +20,7 @@ const PRECACHE_URLS = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
       Promise.allSettled(PRECACHE_URLS.map(u => cache.add(u)))

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gunluk-cache-v4';
+const CACHE_NAME = 'gunluk-cache-v5';
 const PRECACHE_URLS = [
   './',
   './index.html',

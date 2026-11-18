@@ -1,16 +1,29 @@
-const CACHE_NAME = 'gunluk-cache-v2';
+const CACHE_NAME = 'gunluk-cache-v3';
 const PRECACHE_URLS = [
   './',
   './index.html',
   './manifest.json',
   './universiteler.js',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './icons/icon-512-maskable.png',
+  './fonts/bricolage-grotesque-600-latin-ext.woff2',
+  './fonts/bricolage-grotesque-600-latin.woff2',
+  './fonts/bricolage-grotesque-700-latin-ext.woff2',
+  './fonts/bricolage-grotesque-700-latin.woff2',
+  './fonts/public-sans-400-latin-ext.woff2',
+  './fonts/public-sans-400-latin.woff2',
+  './fonts/public-sans-600-latin-ext.woff2',
+  './fonts/public-sans-600-latin.woff2',
+  './fonts/caveat-400-latin-ext.woff2',
+  './fonts/caveat-400-latin.woff2'
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.allSettled(PRECACHE_URLS.map(u => cache.add(u)))
+    )
   );
 });
 

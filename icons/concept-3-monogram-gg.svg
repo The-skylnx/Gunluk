@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="ggBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#16201D" />
+      <stop offset="100%" stop-color="#0B100E" />
+    </linearGradient>
+    <linearGradient id="ggAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#E87A1E" />
+    </linearGradient>
+    <filter id="mShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <!-- Arka Plan -->
+  <rect width="512" height="512" rx="112" fill="url(#ggBg)" />
+
+  <!-- Dış İnce Cetvel / Çizgili Çerçeve -->
+  <rect x="52" y="52" width="408" height="408" rx="80" fill="none" stroke="#2A3833" stroke-width="4" stroke-dasharray="12 8" />
+
+  <!-- İkili Geometrik GG Monogramı -->
+  <g transform="translate(136, 136)" filter="url(#mShadow)">
+    <!-- Sol G -->
+    <path d="M100,0 C45,0 0,45 0,100 C0,155 45,200 100,200 C155,200 190,165 190,120 L100,120 L100,85 L225,85 C228,95 230,110 230,120 C230,185 175,240 100,240 C20,240 -40,175 -40,100 C-40,25 20,-40 100,-40 C150,-40 190,-15 215,20 L185,45 C165,20 135,0 100,0 Z" fill="#F2F4F7" />
+    <!-- Sağ Vurgulu Turuncu G -->
+    <path d="M160,30 C125,30 95,55 85,90 L125,90 C130,70 145,55 165,55 C190,55 210,75 210,100 C210,125 190,145 165,145 L135,145 L135,175 L165,175 C205,175 240,140 240,100 C240,60 205,30 160,30 Z" fill="url(#ggAccent)" />
+  </g>
+
+  <!-- Küçük Kırmızı Defter Vurgu İğnesi / Mührü -->
+  <circle cx="396" cy="116" r="14" fill="#E5484D" />
+</svg>

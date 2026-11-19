@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gunluk-cache-v15';
+const CACHE_NAME = 'gunluk-cache-v16';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -16,7 +16,8 @@ const PRECACHE_URLS = [
   './fonts/public-sans-600-latin-ext.woff2',
   './fonts/public-sans-600-latin.woff2',
   './fonts/caveat-400-latin-ext.woff2',
-  './fonts/caveat-400-latin.woff2'
+  './fonts/caveat-400-latin.woff2',
+  './fonts/times.ttf'
 ];
 
 self.addEventListener('install', event => {

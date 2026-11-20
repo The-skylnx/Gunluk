@@ -1,13 +1,13 @@
-const CACHE_NAME = 'gunluk-cache-v18';
+const CACHE_NAME = 'gunluk-cache-v19';
 const PRECACHE_URLS = [
   './',
   './index.html',
-  './manifest.json',
+  './manifest.json?v=19',
   './universiteler.js',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-512-maskable.png',
-  './icons/apple-touch-icon.png',
+  './icons/icon-192.png?v=19',
+  './icons/icon-512.png?v=19',
+  './icons/icon-512-maskable.png?v=19',
+  './icons/apple-touch-icon.png?v=19',
   './fonts/bricolage-grotesque-600-latin-ext.woff2',
   './fonts/bricolage-grotesque-600-latin.woff2',
   './fonts/bricolage-grotesque-700-latin-ext.woff2',
@@ -16,8 +16,6 @@ const PRECACHE_URLS = [
   './fonts/public-sans-400-latin.woff2',
   './fonts/public-sans-600-latin-ext.woff2',
   './fonts/public-sans-600-latin.woff2',
-  './fonts/caveat-400-latin-ext.woff2',
-  './fonts/caveat-400-latin.woff2',
   './fonts/times.ttf'
 ];
 

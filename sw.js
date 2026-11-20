@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gunluk-cache-v17';
+const CACHE_NAME = 'gunluk-cache-v18';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const PRECACHE_URLS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-512-maskable.png',
+  './icons/apple-touch-icon.png',
   './fonts/bricolage-grotesque-600-latin-ext.woff2',
   './fonts/bricolage-grotesque-600-latin.woff2',
   './fonts/bricolage-grotesque-700-latin-ext.woff2',
